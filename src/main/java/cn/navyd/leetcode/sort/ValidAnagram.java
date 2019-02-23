@@ -45,11 +45,12 @@ public class ValidAnagram {
       return true;
     }
   }
-  
+
   // 不同的解决方案
 
   /**
    * 与我的一致
+   * 
    * @author navyd
    *
    */
@@ -63,6 +64,32 @@ public class ValidAnagram {
       Arrays.sort(str1);
       Arrays.sort(str2);
       return Arrays.equals(str1, str2);
+    }
+  }
+
+  /**
+   * 使用Hash table，使用一个长度为26的int[]，对于每个出现的char则相对与'a'的int值count++，即记录指定char出现的次数。
+   * 对于另一个字符串，则count--，如果两个字符串出现的char相同，则最后所有的count为0.否则一定不同
+   * @author navyd
+   *
+   */
+  static class HashTableSolution {
+    boolean isAnagramWithHash(String s, String t) {
+      if (s.length() != t.length())
+        return false;
+      // 26个小写字母
+      char[] counter = new char[26];
+      int length = s.length();
+      // 最小字符
+      char minChar = 'a';
+      for (int i = 0; i < length; i++) {
+        counter[s.charAt(i) - minChar]++;
+        counter[t.charAt(i) - minChar]--;
+      }
+      for (int count : counter)
+        if (count != 0)
+          return false;
+      return true;
     }
   }
 }

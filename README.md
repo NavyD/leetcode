@@ -6,4 +6,4 @@
 
 序号 | 题名                                                          | 难度 | 解法 | 标签
 -----|---------------------------------------------------------------|------|------|-----
-242  | [Valid Anagram](https://leetcode.com/problems/valid-anagram/) | Easy | 1    | sort
+242  | [Valid Anagram](https://leetcode.com/problems/valid-anagram/) | Easy | 2    | sort
