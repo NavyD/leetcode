@@ -1,6 +1,7 @@
 package cn.navyd.leetcode.sort;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -73,5 +74,102 @@ public class KClosestPointstoOrigin {
       
     }
     return r;
+  }
+  
+  static class Solution {
+    public int[][] kClosest(int[][] points, int K) {
+      return kClosestByDivideAndConquer(points, K);
+    }
+    /**
+     * 思路：通过将距离排序获取k范围内的最大距离maxDist，然后遍历获取<=maxDist的point
+     * 时间复杂度：O(N log N)主要在排序中。未保存distances对应的points下标，而是使用遍历的方式重新计算获取，减少空间复杂度
+     * 空间复杂度：O(N)
+     * @param points
+     * @param K
+     * @return
+     */
+    public int[][] kClosestBySort(int[][] points, int K) {
+      // 获取distance数组
+      int len = points.length;
+      int[] distances = new int[len];
+      for (int i = 0; i < len; i++)
+        distances[i] = distance(points[i]);
+      // 排序
+      Arrays.sort(distances);
+      // 获取distance[k-1]最大的距离
+      int maxDistance = distances[K-1];
+      // 遍历points比较距离，<=最大的添加
+      int[][] r = new int[K][2];
+      int i = 0;
+      for (int[] point : points) {
+        if (distance(point) <= maxDistance)
+          r[i++] = point;
+      }
+      return r;
+    }
+    
+    private int distance(int[] point) {
+      return point[0] * point[0] + point[1] * point[1];
+    }
+    
+    // Divide and Conquer
+    /**
+     * 思路：基于快速排序的quick select。不需要对所有元素排序，只需要选择指定的范围即可
+     * 每个数组元素使得在切分点pivot左边元素都<=pivot，右边都>pivot，然后返回的切分点下标mid，
+     * 如果[0-mid]的元素数量q<K，元素较少则继续切分[mid+1,hi]。
+     * 如果q>K，元素过多继续切分[lo, mid-1]。
+     * 如果q==K则刚好满足停止。
+     * 时间复杂度：与快排类似，平均为O(N)，最坏为N^2/2
+     * 空间复杂度：O(N)
+     * @param points
+     * @param K
+     * @return
+     */
+    public int[][] kClosestByDivideAndConquer(int[][] points, int K) {
+      sort(points, 0, points.length-1, K);
+      return Arrays.copyOf(points, K);
+    }
+    
+    private void sort(int[][] points, int lo, int hi, int K) {
+      // K 表示选择多少个元素
+      K -=1;
+      // 切分元素直到满足K个元素
+      while (lo <= hi) {
+        int mid = partition(points, lo, hi);
+        if (mid == K)
+          break;
+        else if (mid < K)
+          lo = mid + 1;
+        else if (mid > K)
+          hi = mid-1;
+      }
+    }
+    
+    private int partition(int[][] points, int lo, int hi) {
+      int pivot = distance(points[lo]);
+      int i = lo, j = hi+1;
+      while (true) {
+        while (distance(points[++i]) <= pivot && i < hi);
+        while (distance(points[--j]) > pivot);
+        if (i >= j)
+          break;
+        swap(points, i, j);
+      }
+      swap(points, lo, j);
+      return j;
+    }
+    
+    private void swap(int[][] a, int i, int j) {
+      int[] tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+    }
+  }
+  
+  public static void main(String[] args) {
+    Solution s = new Solution();
+//    int[][] a = {{1,3},{-2,2}};
+    int[][] a = {{-2,10},{-4,-8},{10,7},{-4,-7}};
+    System.err.println(Arrays.deepToString(s.kClosest(a, 3)));;
   }
 }
