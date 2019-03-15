@@ -70,12 +70,37 @@ public class SortColors {
     nums[j] = tmp;
   }
   
+  static class Solution {
+    /**
+     * 思路：使用计数排序，将0,1,2三个值作为数组下标，计算出现的次数，然后重新赋值
+     * 时间复杂度：O(N)
+     * 空间复杂度：O(1)
+     * @param nums
+     */
+    public static void sortColorsByCountSort(int[] nums) {
+      // 计数
+      int[] counter = new int[3];
+      for (int num : nums)
+        counter[num]++;
+      // 排序
+      int i = 0;
+      // k表示nums值也表示counter下标
+      for (int k = 0; k < counter.length; k++) { 
+        int count = counter[k];
+        while (count-- > 0)
+          // 赋值
+          nums[i++] = k;
+      }
+    }
+  }
+  
   public static void main(String[] args) {
     int[] 
-//        a = {2,0,2,1,1,0};
-        a= {1,0,2};
-    SortColors o = new SortColors();
-    o.sortColors(a);
+        a = {2,0,2,1,1,0};
+//        a= {1,0,2};
+//    SortColors o = new SortColors();
+//    o.sortColors(a);
+    Solution.sortColorsByCountSort(a);
     System.err.println(Arrays.toString(a));
   }
 }
