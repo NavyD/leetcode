@@ -14,3 +14,4 @@
 976  | [Largest Perimeter Triangle](https://leetcode.com/problems/largest-perimeter-triangle/)       | Easy   | 1    | sort
 56   | [Merge Intervals](https://leetcode.com/problems/merge-intervals/)                             | Medium | 1    | sort
 75   | [Sort Colors](https://leetcode.com/problems/sort-colors/)                                     | Medium | 2    | sort
+147  | [Insertion Sort List](https://leetcode.com/problems/insertion-sort-list/)                     | Medium | 2    | sort
