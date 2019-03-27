@@ -15,4 +15,4 @@
 56   | [Merge Intervals](https://leetcode.com/problems/merge-intervals/)                             | Medium | 1    | sort
 75   | [Sort Colors](https://leetcode.com/problems/sort-colors/)                                     | Medium | 2    | sort
 147  | [Insertion Sort List](https://leetcode.com/problems/insertion-sort-list/)                     | Medium | 2    | sort
-148  | [Sort List](https://leetcode.com/problems/sort-list/)                                         | Medium | 1    | sort
+148  | [Sort List](https://leetcode.com/problems/sort-list/)                                         | Medium | 2    | sort
