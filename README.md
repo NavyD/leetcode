@@ -17,3 +17,4 @@
 147  | [Insertion Sort List](https://leetcode.com/problems/insertion-sort-list/)                     | Medium | 2    | sort
 148  | [Sort List](https://leetcode.com/problems/sort-list/)                                         | Medium | 2    | sort
 179  | [Largest Number](https://leetcode.com/problems/largest-number/)                               | Medium | 1    | sort
+274  | [H-Index](https://leetcode.com/problems/h-index/)                                             | Medium | 1    | sort
