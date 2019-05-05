@@ -44,7 +44,7 @@ public @interface Problem {
    * 问题的编号。
    * @return
    */
-  int number();
+  short number();
   
   /**
    * 问题的难度
@@ -56,13 +56,7 @@ public @interface Problem {
    * 解决的次数
    * @return
    */
-  int resolvedCount();
-  
-  /**
-   * 是否熟练
-   * @return
-   */
-  boolean skilled() default false;
+  byte resolvedCount();
   
   public static enum Tag {
     NONE,

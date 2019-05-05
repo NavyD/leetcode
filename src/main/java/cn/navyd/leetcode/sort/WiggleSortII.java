@@ -5,6 +5,7 @@ import cn.navyd.leetcode.util.annotation.Problem;
 import cn.navyd.leetcode.util.annotation.Problem.Difficulty;
 import cn.navyd.leetcode.util.annotation.Problem.Tag;
 import cn.navyd.leetcode.util.annotation.Solution;
+import cn.navyd.leetcode.util.annotation.Unskilled;
 import cn.navyd.leetcode.util.annotation.Solution.Complexity;
 import cn.navyd.leetcode.util.annotation.Solution.SolutionStatus;
 
@@ -28,7 +29,8 @@ Can you do it in O(n) time and/or in-place with O(1) extra space?
 </pre>
  *
  */
-@Problem(number = 324, tags = Tag.SORT, difficulty = Difficulty.MEDIUM, url = "https://leetcode.com/problems/wiggle-sort-ii/", resolvedCount = 1, skilled = false)
+@Unskilled
+@Problem(number = 324, tags = Tag.SORT, difficulty = Difficulty.MEDIUM, url = "https://leetcode.com/problems/wiggle-sort-ii/", resolvedCount = 1)
 public interface WiggleSortII {
   /**
    * wiggle sorted：任意的odd元素大于其两个even neighbor元素
