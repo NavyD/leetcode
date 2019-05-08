@@ -39,6 +39,11 @@
 			<version>${assertj.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>cn.navyd</groupId>
+			<artifactId>useful-annotation</artifactId>
+			<version>1.0.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>
