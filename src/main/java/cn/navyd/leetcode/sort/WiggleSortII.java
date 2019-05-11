@@ -147,11 +147,14 @@ public interface WiggleSortII {
         if (aux[i] < median)
           swap(aux, i++, lt++);
         else if (aux[i] > median)
-          swap(aux, i++, gt--);
+//          swap(aux, i++, gt--);
+          // 注意不能i++，会导致交换过来的跳过不检查了，小于的能++是因为已经检查过的小于则跳过++
+          // 不过居然通过了leetcode测试。。。
+          swap(aux, i, gt--);
         else 
           i++;
       }
-      // 组合
+      // placement
       // 将aux左边元素复制到nums的even group。注意size > odd group，因为有midIndex个而midIndex超过一半(n+1)/2
       for (int i = 0, j = midIndex-1; j >= 0; i+=2, j--)
         nums[i] = aux[j];
@@ -187,6 +190,15 @@ public interface WiggleSortII {
       return nums[k];
     }
     
+    /**
+     * 如果将<= 改为 <，运行时间还增加了，与{@link SolutionByCombiningPartitionAndPlacement#partition(int[], int, int)}的修改减少
+     * 时间不符合
+     * 修改为< : runtime = 88, submissionurl:https://leetcode.com/submissions/detail/228165594/
+     * @param nums
+     * @param lo
+     * @param hi
+     * @return
+     */
     int partition(int[] nums, int lo, int hi) {
       final int pivot = nums[hi];
       int i = lo;
@@ -202,6 +214,72 @@ public interface WiggleSortII {
       int tmp = nums[i];
       nums[i] = nums[j];
       nums[j] = tmp;
+    }
+  }
+  
+  @Solution(status=Status.ACCEPTED,
+      timeComplexity = Complexity.O_N, spaceComplexity = Complexity.O_1,
+      runtime = 33, runtimeBeatRate = 41.09, memory = 41, memoryBeatRate = 57.95,
+      dates = "2019-05-11", 
+      submissionUrl = "https://leetcode.com/submissions/detail/228161720/",
+      referenceUrls = {
+          "https://leetcode.com/problems/wiggle-sort-ii/discuss/77682/Step-by-step-explanation-of-index-mapping-in-Java",
+          "https://leetcode.com/problems/wiggle-sort-ii/discuss/77684/Summary-of-the-various-solutions-to-Wiggle-Sort-for-your-reference",
+      })
+  public static class SolutionByCombiningPartitionAndPlacement extends SolutionByMedianPartition {
+
+    /**
+     * 不同于{@link SolutionByMedianPartition}，该方案将partition与placement组合到一起，不需要辅助数组aux使in-place。
+     * <p>由于需要保证每个元素有且仅有一次partition，原来的正常的遍历顺序将会导致nums元素被partition到
+     * 未遍历的位置时可能被partition多次
+     * <p>使用Virtual Indexing规则 {@code (1+2*(i)) % (n|1)}，首先遍历访问odd group:[1,3,5,...]，再访问even group:[0,2,4,...]，注意group size: even >= odd。
+     * <p>(n|1)将偶数size与对应的奇数size一致，如 6|1==>7, 7|1 ==> 7。
+     * 当i=3，n=6和n=7时不同的值：(1+2*3) % 6=1，(1+2*3) % 7=0，即当n为偶数时会导致再访问一遍之前的下标
+     * <pre>
+Original idx: 0    1    2    3    4    5  
+Mapped idx:   1    3    5    0    2    4 
+     * </pre>
+     * <p>使用Virtual Indexing使每个元素仅被访问交换一次
+     */
+    @Override
+    public void wiggleSort(int[] nums) {
+      final int n = nums.length, midIndex = (n + 1) / 2;
+      // 获取median
+      final int median = findKthLargest(nums, midIndex); 
+      // partition 和 placement
+      // odd, even表示index()后的下标含义
+      for (int i = 0, odd = 0, even = n - 1; i <= even;) {
+        int num = nums[index(i, n)];
+        // 将大的放到奇数下标上
+        if (num > median) {
+          swap(nums, index(odd++, n), index(i++, n));
+        } 
+        // 将小的放到偶数下标上。注意i不能++，因为交换过来的even没有比较
+        else if (num < median) {
+          swap(nums, index(even--, n), index(i, n));
+        } else 
+          i++;
+      }
+    }
+    
+    static int index(int i, int n) {
+      return (1 + 2 * i) % (n | 1);
+    }
+    
+    /**
+     * 较少等值交换
+     */
+    @Override
+    int partition(int[] nums, int lo, int hi) {
+      final int pivot = nums[hi];
+      int i = lo;
+      for (int j = lo; j < hi; j++) {
+        // <= 改为 <，减少相等值的交换
+        if (nums[j] < pivot)
+          swap(nums, i++, j);
+      }
+      swap(nums, i, hi);
+      return i;
     }
   }
 }
