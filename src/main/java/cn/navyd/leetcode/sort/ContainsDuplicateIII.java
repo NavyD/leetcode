@@ -52,6 +52,7 @@ public interface ContainsDuplicateIII {
     }
   }
   
+  @Author(name = "jmnarloch", referenceUrls = "https://leetcode.com/problems/contains-duplicate-iii/discuss/61655/Java-O(N-lg-K)-solution")
   @Author(name = "wzrthhj", significant = true, 
       referenceUrls = "https://leetcode.com/problems/contains-duplicate-iii/discuss/61645/AC-O(N)-solution-in-Java-using-buckets-with-explanation/62992")
   @Author(name = "lx223", significant = true, 
@@ -59,7 +60,7 @@ public interface ContainsDuplicateIII {
   @Submission(date = "2019-05-13", status = Status.ACCEPTED,
       runtime = 8, runtimeBeatRate = 95.30, memory = 36.9, memoryBeatRate = 72.56,
       url = "https://leetcode.com/submissions/detail/228570208/")
-  @Solution(tags = Tag.SORT_BUCKET, timeComplexity = Complexity.O_N, spaceComplexity = Complexity.O_K)
+  @Solution(tags = Tag.SORT_BUCKET, timeComplexity = Complexity.O_N_LOG_K, spaceComplexity = Complexity.O_K)
   public static class SolutionByBucketSort implements ContainsDuplicateIII {
     /**
      * 对nums使用桶排序的思路解决：就是将t作为一个区分重复元素的范围值
