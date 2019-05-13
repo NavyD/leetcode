@@ -19,4 +19,5 @@
 179  | [Largest Number](https://leetcode.com/problems/largest-number/)                                   | Medium | 1    | sort
 274  | [H-Index](https://leetcode.com/problems/h-index/)                                                 | Medium | 1    | sort
 324  | [Wiggle Sort II](https://leetcode.com/problems/wiggle-sort-ii/)                                   | Medium | 4    | sort
+220  | [Contains Duplicate III](https://leetcode.com/problems/contains-duplicate-iii/)                   | Medium | 2    | sort
 215  | [Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/) | Medium | 4    | heap
