@@ -1,12 +1,18 @@
 package cn.navyd.leetcode.sort;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.Arrays;
+import cn.navyd.annotation.leetcode.Author;
+import cn.navyd.annotation.leetcode.Problem;
+import cn.navyd.annotation.leetcode.Solution;
+import cn.navyd.annotation.leetcode.Solution.Complexity;
+import cn.navyd.annotation.leetcode.Submission;
+import cn.navyd.annotation.leetcode.Submission.Status;
+import cn.navyd.annotation.leetcode.Problem.Difficulty;
+import cn.navyd.annotation.leetcode.Problem.Tag;
+import cn.navyd.annotation.leetcode.Unskilled;
 
 /**
+ * <pre>
 Given a collection of intervals, merge all overlapping intervals.
 
 Example 1:
@@ -19,121 +25,79 @@ Example 2:
 Input: [[1,4],[4,5]]
 Output: [[1,5]]
 Explanation: Intervals [1,4] and [4,5] are considered overlapping.
+NOTE: input types have been changed on April 15, 2019. Please reset to default code definition to get new method signature.
+ * </pre>
  * @author navyd
  *
  */
-public class MergeIntervals {
+@Unskilled
+@Problem(number = 56, difficulty = Difficulty.MEDIUM, tags = Tag.SORT, url = "https://leetcode.com/problems/merge-intervals/")
+public interface MergeIntervals {
   /**
-   * Definition for an interval.
-   * public class Interval {
-   *     int start;
-   *     int end;
-   *     Interval() { start = 0; end = 0; }
-   *     Interval(int s, int e) { start = s; end = e; }
-   * }
-   */
-  public static class Interval {
-    int start;
-    int end;
-
-    Interval() {
-      start = 0;
-      end = 0;
-    }
-
-    Interval(int s, int e) {
-      start = s;
-      end = e;
-    }
-
-    @Override
-    public String toString() {
-      return "Interval [start=" + start + ", end=" + end + "]";
-    }
-    
-  }
-  
-  Comparator<Interval> ascending = (o1, o2) -> o1.start < o2.start ? -1 : (o1.start > o2.start ? 1 : 0);
-  
-  /**
-   * 思路：排序按照interval.start，对于当前的interval cur与后面每个interval that，
-   * 如果相交（仅需要判断cur.end>=that.end），
-   * 合并cur、that为新的cur，获取下一个that。
-   * 时间复杂度：O(NlogN) 排序
-   * 空间复杂度：O(N)
+   * 合并重叠的区间
    * @param intervals
    * @return
    */
-  public List<Interval> merge(List<Interval> intervals) {
-    // 排序
-    intervals.sort(ascending);
-    ListIterator<Interval> it = intervals.listIterator();
-    Interval cur = null;
-    // 如果相交，则将两个interval并合并一个。然后使用当前合并的interval比较下一个是否能合并
-    while (it.hasNext()) {
-      if (cur == null)
-        cur = it.next();
-      Interval that;
-      while (it.hasNext()) {
-        that = it.next();
-        if (isCross(cur, that)) {
-          it.remove();
-          mergeWith(cur, that);
-        } else {
-          cur = that;
-          break;
-        }
-      }
-    }
-    return intervals;
-  }
+  public int[][] merge(int[][] intervals);
   
-  static boolean isCross(Interval cur, Interval other) {
-    return cur.start <= other.start && cur.end >= other.start;
-  }
-  
-  static Interval mergeWith(Interval cur, Interval that) {
-    if (cur.end < that.end)
-      cur.end = that.end;
-    return cur;
-  }
-  
-  static class Solution {
+  @Author(name = "brubru777", significant = true, 
+      referenceUrls = "https://leetcode.com/problems/merge-intervals/discuss/21222/A-simple-Java-solution")
+  @Submission(date = "2019-05-16", status = Status.ACCEPTED,
+      runtime = 36, runtimeBeatRate = 41.45, memory = 36, memoryBeatRate = 99.99,
+      url = "https://leetcode.com/submissions/detail/229207368/")
+  @Solution(timeComplexity = Complexity.O_N_LOG_N, spaceComplexity = Complexity.O_N)
+  public static class SolutionBySort implements MergeIntervals {
+
     /**
-     * 思路：类似
-     * @param intervals
-     * @return
+     * 思路：合并两个重复的区间，如果intervals是根据interval.start有序的，合并区间时，只需要判断当前区间cur.end与下一个区间的next.start的关系即可
+     * <ol>
+     * <li>如果cur.end >= next.start说明两区间相交。否则不相交
+     * <li>如果相交，则cur.end更新为cur next end的较大值
+     * <li>继续使用更新后的cur interval去合并下一个区间。保证区间的连续
+     * <li>当两个区间不相交时，更新cur interval为next，上一个区间已经完全合并完毕
+     * </ol>
+     * 实现：
+     * <ul>
+     * <li>排序比较器：使用start比较{@code (i1, i2) -> i1[0] - i2[0]}
+     * <li>不允许返回存在null的intervals，只能返回一个新的数组。该length在合并时统计即可
+     * </ul>
      */
-    public List<Interval> mergeBySort(List<Interval> intervals) {
+    @Override
+    public int[][] merge(int[][] intervals) {
+      if (intervals == null || intervals.length < 2)
+        return intervals;
       // 排序
-      intervals.sort((i1, i2) -> i1.start - i2.start);
-      List<Interval> merged = new LinkedList<>();
-      // 获取最近的interval
-      Interval last = null;
-      for (Interval val : intervals) {
-        // 如果last与下一个val不相交 则添加
-        if (merged.isEmpty() || last.end < val.start)
-          merged.add((last = val));
-        // 相交 合并end
-        else {
-          // 修改引用
-          last.end = Math.max(last.end, val.end);
-        }
+      Arrays.sort(intervals, (i1, i2) -> i1[0] - i2[0]);
+      // 合并的新数组 size
+      int mergedIntervalsSize = intervals.length;
+      // 当前合并的区间
+      int[] curInterval = intervals[0];
+      for (int i = 1; i < intervals.length; i++) {
+        int[] nextInterval = intervals[i];
+        final int curEnd = curInterval[1], 
+            nextStart = nextInterval[0], 
+            nextEnd = nextInterval[1]; 
+        // 两个区间 相交
+        if (curEnd >= nextStart) {
+          // 将当前区间end置为两区间end较大值
+          curInterval[1] = Integer.max(curEnd, nextEnd);
+          // 将next置为null
+          intervals[i] = null;
+          // 合并一个区间 size-1
+          mergedIntervalsSize--;
+        } 
+        // 不相交，重置比较区间
+        else
+          curInterval = nextInterval;
       }
-      return merged;
+      // 返回比较结果
+      int[][] mergedIntervals = new int[mergedIntervalsSize][];
+      for (int i = 0, j = 0; i < intervals.length; i++) {
+        int[] cur = intervals[i];
+        if (cur != null)
+          mergedIntervals[j++] = cur;
+      }
+      return mergedIntervals;
     }
-  }
-  
-  public static void main(String[] args) {
-    int[][] 
-//        a = {{1,3},{2,6},{8,10},{15,18}};
-//        a = {{1,4},{4,5}};
-        a = {{2,3},{2,2},{3,3},{1,3},{5,7},{2,2},{4,6}};
-    List<Interval> intervals = new ArrayList<>();
-    for (int[] val : a)
-      intervals.add(new Interval(val[0], val[1]));
-    System.err.println(intervals);
-    MergeIntervals o = new MergeIntervals();
-    System.err.println(o.merge(intervals));
   }
 }
