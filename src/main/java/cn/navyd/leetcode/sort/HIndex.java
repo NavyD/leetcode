@@ -122,7 +122,7 @@ public interface HIndex {
   @Submission(date = "2019-05-15", status = Status.ACCEPTED, 
   runtime = 1, runtimeBeatRate = 81.61, memory = 35.1, memoryBeatRate = 98.91,
   url = "https://leetcode.com/submissions/detail/228970601/")
-  @Solution(timeComplexity = Complexity.O_N_LOG_N, spaceComplexity = Complexity.O_1, derived = SolutionBySort.class)
+  @Solution(timeComplexity = Complexity.O_N_LOG_N, spaceComplexity = Complexity.O_1)
   public static class SolutionBySortEndToStart implements HIndex {
 
     /**
