@@ -12,7 +12,7 @@
 922  | [Sort Array By Parity II](https://leetcode.com/problems/sort-array-by-parity-ii/)                 | Easy   | 1    | sort
 973  | [K Closest Points to Origin](https://leetcode.com/problems/k-closest-points-to-origin/)           | Easy   | 2    | sort
 976  | [Largest Perimeter Triangle](https://leetcode.com/problems/largest-perimeter-triangle/)           | Easy   | 1    | sort
-56   | [Merge Intervals](https://leetcode.com/problems/merge-intervals/)                                 | Medium | 1    | sort
+56   | [Merge Intervals](https://leetcode.com/problems/merge-intervals/)                                 | Medium | 2    | sort
 75   | [Sort Colors](https://leetcode.com/problems/sort-colors/)                                         | Medium | 2    | sort
 147  | [Insertion Sort List](https://leetcode.com/problems/insertion-sort-list/)                         | Medium | 2    | sort
 148  | [Sort List](https://leetcode.com/problems/sort-list/)                                             | Medium | 2    | sort
