@@ -1,6 +1,14 @@
 package cn.navyd.leetcode.sort;
 
-import java.util.Arrays;
+import cn.navyd.annotation.leetcode.Author;
+import cn.navyd.annotation.leetcode.Optimal;
+import cn.navyd.annotation.leetcode.Problem;
+import cn.navyd.annotation.leetcode.Problem.Difficulty;
+import cn.navyd.annotation.leetcode.Problem.Tag;
+import cn.navyd.annotation.leetcode.Solution;
+import cn.navyd.annotation.leetcode.Solution.Complexity;
+import cn.navyd.annotation.leetcode.Submission;
+import cn.navyd.annotation.leetcode.Unskilled;
 
 /**
 Given an array with n objects colored red, white or blue, sort them in-place so that objects of the same color are adjacent, with the colors in the order red, white and blue.
@@ -22,85 +30,80 @@ Could you come up with a one-pass algorithm using only constant space?
  * @author navyd
  *
  */
-public class SortColors {
+@Problem(number = 75, difficulty = Difficulty.MEDIUM, tags = Tag.SORT, url = "https://leetcode.com/problems/sort-colors/")
+public interface SortColors {
   /**
-   * 思路：利用快速排序的partition将仅有三种类型的值0,1,2分开，使用pivot=1分为四个区域：
-   * [=pivot...<pivot...>pivot...=pivot]，然后合并为三个区域[<pivot...=pivot...>pivot]
-   * 该方法不需要快速排序的递归，分区后即完成排序
-   * 时间复杂度：O(N) 主要为元素比较和交换
-   * 空间复杂度：O(1)
+   * 将nums的三种元素0,1,2排序。不能使用类库
    * @param nums
    */
-  public void sortColors(int[] nums) {
-    partition(nums, 0, nums.length-1);
-  }
-  
-  static void partition(int[] nums, int lo, int hi) {
-    final int pivot = 1;
-    int i = lo-1, p = lo-1, j = hi+1, q = hi+1;
-    while (true) {
-      while (i < hi && nums[++i] < pivot)
-        ;
-      while (j > lo && nums[--j] > pivot)
-        ;
-      if (i == j && nums[i] == pivot)
-        swap(nums, i, ++p);
-      if (i >= j)
-        break;
-      swap(nums, i, j);
-      
-      if (nums[i] == pivot)
-        swap(nums, i, ++p);
-      
-      if (nums[j] == pivot)
-        swap(nums, j, --q);
-    }
-    i = j + 1;
-    for (int k = lo; k <= p; k++) 
-      swap(nums, k, j--);
-    for (int k = hi; k >= q; k--)
-      swap(nums, i++, k);
-  }
-  
-  static void swap(int[] nums, int i, int j) {
-    if (i == j)
-      return;
-    int tmp = nums[i];
-    nums[i] = nums[j];
-    nums[j] = tmp;
-  }
-  
-  static class Solution {
+  public void sortColors(int[] nums);
+
+  // two-pass
+  @Unskilled
+  @Submission(date = "2019-05-19", 
+      runtime = 0, runtimeBeatRate = 100.00, memory = 34.3, memoryBeatRate = 100.00,
+      url = "https://leetcode.com/submissions/detail/229812204/")
+  @Submission(date = "2019-03-16", 
+    runtime = 0, runtimeBeatRate = 100.00, memory = 34.8, memoryBeatRate = 95.61,
+    url = "https://leetcode.com/submissions/detail/215028926/")
+  @Solution(timeComplexity = Complexity.O_N, spaceComplexity = Complexity.O_1, tags = Tag.SORT_COUNTING)
+  public static class SolutionByCounting implements SortColors {
+
     /**
-     * 思路：使用计数排序，将0,1,2三个值作为数组下标，计算出现的次数，然后重新赋值
-     * 时间复杂度：O(N)
-     * 空间复杂度：O(1)
-     * @param nums
+     * 思路：对于连续范围的数0,1,2使用计数排序。小范围 int类型适合使用计数排序
      */
-    public static void sortColorsByCountSort(int[] nums) {
-      // 计数
-      int[] counter = new int[3];
+    @Override
+    public void sortColors(int[] nums) {
+      // 构造计数数组
+      final int len = 3;
+      int[] counts = new int[len];
       for (int num : nums)
-        counter[num]++;
-      // 排序
-      int i = 0;
-      // k表示nums值也表示counter下标
-      for (int k = 0; k < counter.length; k++) { 
-        int count = counter[k];
+        counts[num]++;
+      // 重置nums。 i表示nums.num，j表示重置数组时的index
+      for (int i = 0, j = 0; i < len; i++) {
+        int count = counts[i];
         while (count-- > 0)
-          // 赋值
-          nums[i++] = k;
+          nums[j++] = i;
       }
     }
   }
   
-  public static void main(String[] args) {
-    int[] 
-        a = {2,0,2,1,1,0};
-//        a= {1,0,2};
-//    SortColors o = new SortColors();
-//    o.sortColors(a);
-    Solution.sortColorsByCountSort(a);
-    System.err.println(Arrays.toString(a));
+  // 最符合题意：one-pass
+  @Optimal
+  @Author(name = "navyd")
+  @Submission(date = "2019-05-19", 
+      runtime = 0, runtimeBeatRate = 100.00, memory = 34.2, memoryBeatRate = 100.00,
+      url = "https://leetcode.com/submissions/detail/229819292/")
+  @Solution(tags = Tag.SORT_QUICK_SELECT, timeComplexity = Complexity.O_N, spaceComplexity = Complexity.O_1)
+  public static class SolutionByPartition implements SortColors {
+
+    /**
+     * 思路：nums仅存在三种元素，是大量重复元素类型，partition-3-way是quick select的最适合的情况
+     * <p>使用pivot=1将数组元素分开
+     */
+    @Override
+    public void sortColors(int[] nums) {
+      partition(nums, 0, nums.length - 1);
+    }
+
+    static void partition(int[] nums, int lo, int hi) {
+      final int pivot = 1;
+      for (int i = 0; i <= hi;) {
+        int num = nums[i];
+        if (num < pivot)
+          swap(nums, i++, lo++);
+        else if (num > pivot)
+          swap(nums, i, hi--);
+        else
+          i++;
+      }
+    }
+
+    static void swap(int[] nums, int i, int j) {
+      int tmp = nums[i];
+      nums[i] = nums[j];
+      nums[j] = tmp;
+    }
+
   }
 }
