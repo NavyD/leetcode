@@ -1,8 +1,24 @@
 package cn.navyd.leetcode.sort;
 
-/**
-Sort a linked list using insertion sort.
+import java.util.Arrays;
+import cn.navyd.annotation.leetcode.Author;
+import cn.navyd.annotation.leetcode.DerivedFrom;
+import cn.navyd.annotation.leetcode.Optimal;
+import cn.navyd.annotation.leetcode.Problem;
+import cn.navyd.annotation.leetcode.Solution;
+import cn.navyd.annotation.leetcode.Submission;
+import cn.navyd.annotation.leetcode.Submission.Status;
+import cn.navyd.annotation.leetcode.Solution.Complexity;
+import cn.navyd.annotation.leetcode.Problem.Difficulty;
+import cn.navyd.annotation.leetcode.Problem.Tag;
+import cn.navyd.annotation.leetcode.Unskilled;
 
+/**
+ * <pre>
+Sort a linked list using insertion sort.
+</pre>
+<img alt="" src="https://upload.wikimedia.org/wikipedia/commons/0/0f/Insertion-sort-example-300px.gif" style="height:180px; width:300px">
+<pre>
 A graphical example of insertion sort. The partial sorted list (black) initially contains only the first element in the list.
 With each iteration one element (red) is removed from the input data and inserted in-place into the sorted list
  
@@ -21,184 +37,150 @@ Example 2:
 
 Input: -1->5->3->4->0
 Output: -1->0->3->4->5
-Accepted
-143,007
-Submissions
-391,278
+ * </pre>
  * @author navyd
  *
  */
-public class InsertionSortList {
+@Unskilled
+@Problem(number = 147, difficulty = Difficulty.MEDIUM, tags = {Tag.SORT}, url = "https://leetcode.com/problems/insertion-sort-list/")
+public interface InsertionSortList {
   public static class ListNode {
     int val;
     ListNode next;
-
     ListNode(int x) {
       val = x;
     }
-
-    @Override
-    public String toString() {
-      return "ListNode [val=" + val + ", next=" + next + "]";
-    }
   }
-
-  public ListNode insertionSortList(ListNode head) {
-    if (head == null)
-      return null;
-    for (ListNode node = head.next, preNode = head; node != null;) {
-      // 找到插入节点
-      ListNode last = findInsertPosition(head, node);
-      // 插入到head前
-      if (last == null) {
-        preNode.next = node.next;
-        node.next = head;
-        head = node;
-        node = preNode.next;
-      } else {
-        // 插入
-        ListNode newLast = last.next;
-        // 删除node
-        preNode.next = node.next;
-        last.next = node;
-        node.next = newLast;
-        node = preNode.next;
-      }
-    }
-    return head;
-  }
-
-  static ListNode insert(ListNode head) {
-    if (head == null)
-      return null;
-    ListNode helper = new ListNode(0), pre = helper, cur = head;
-    while (cur != null) {
-      // 找到插入点
-      while (pre.next != null && pre.next.val < cur.val)
-        pre = pre.next;
-      // 将cur插入到pre后
-      pre.next = cur;
-      cur = cur.next;
-      pre = helper;
-    }
-    return helper.next;
-  }
-
-  // 元素插入链表，需要从head开始遍历比较
-
+  
   /**
-   * 返回指定node在链表插入的前一个元素
-   * 
+   * 对链表head使用插入排序
    * @param head
-   * @param node
    * @return
    */
-  static ListNode findInsertPosition(ListNode head, ListNode node) {
-    ListNode cur = head;
-    ListNode last = null;
-    while (cur != null) {
-      if (cur.val > node.val || cur == node)
-        break;
-      last = cur;
-      cur = cur.next;
-    }
-    return last;
-  }
+  public ListNode insertionSortList(ListNode head);
+  
+  @Author(name = "sbvictory", significant = true, 
+      referenceUrls = "https://leetcode.com/problems/insertion-sort-list/discuss/46420/An-easy-and-clear-way-to-sort-(-O(1)-space-)")
+  @Submission(date = "2019-05-20", status = Status.ACCEPTED,
+      runtime = 30, runtimeBeatRate = 60.33, memory = 36.7, memoryBeatRate = 99.54,
+      url = "https://leetcode.com/submissions/detail/230066826/")
+  @Submission(date = "2019-03-18", status = Status.ACCEPTED,
+      runtime = 32, runtimeBeatRate = 28.1, memory = 38, memoryBeatRate = 59.01,
+      url = "https://leetcode.com/submissions/detail/215740064/")
+  @Solution(timeComplexity = Complexity.O_N_POW_2, spaceComplexity = Complexity.O_1)
+  public static class SolutionByDummyNode implements InsertionSortList {
 
-  static void build(int[] a) {
-    ListNode node = new ListNode(a[0]);
-    for (int i = 1; i < a.length; i++) {
-      node.next = new ListNode(i);
-    }
-  }
-
-  static String iterate(ListNode node) {
-    String s = "";
-    while (node != null) {
-      s += node.val + ", ";
-      node = node.next;
-    }
-    return s;
-  }
-
-  public static void main(String[] args) {
-    int[]
-    // a = {4,2,1,3};
-    a = {-1, 5, 3, 4, 0};
-    ListNode head = new ListNode(a[0]), node = head;
-    for (int i = 1; i < a.length; i++) {
-      node.next = new ListNode(a[i]);
-      node = node.next;
-    }
-    insert(head);
-    // InsertionSortList o = new InsertionSortList();
-    //// System.err.println(iterate(head));
-    // System.err.println(o.insertionSortList(head));
-  }
-
-  static class Solution {
     /**
-     * 思路：使用一个fake head node保存排序的list，使用节点cur不断的在fake head查找插入点pre，
-     * 然后插入到pre后面，主要要删除cur.next原来连接的head未排序的节点，应该连接新的fake head pre.next节点，
-     * 保证有序
-     * 时间复杂度：O(N^2)
-     * 空间复杂度：O(1)
-     * @param head
-     * @return
+     * 思路：
+     * <p>使用一个dummy节点作为开始链接已排序的nodes，要插入一个node到已排序的 单链表 list中，
+     * 需要保存一个prev节点链接新的节点，使用节点prev.next.val与当前节点cur.val比较，一旦找到
+     * {@code prev.next.val >= cur.val}时，才能将cur插入到prev的后面
+     * <p>关键点在于使用prev.next与cur比较，插入 prev->cur
      */
-    public ListNode insertionSortListByFakeHead(ListNode head) {
-      // 已排序的head
-      ListNode helper = new ListNode(0),
-          // 插入点
-          pre = helper, cur = head;
-      while (cur != null) {
-        // 找到插入点
-        while (pre.next != null && pre.next.val < cur.val)
-          pre = pre.next;
+    @Override
+    public ListNode insertionSortList(ListNode head) {
+      if (head == null || head.next == null)
+        return head;
+      // 虚拟节点，链接已排序的nodes
+      final ListNode dummy = new ListNode(0);
+      ListNode prev = dummy;
+      for (ListNode cur = head; cur != null;) {
+        // 找到cur在prev的位置
+        while (prev.next != null && prev.next.val < cur.val)
+          prev = prev.next;
         ListNode next = cur.next;
-        // 将cur插入到pre后
-        cur.next = pre.next;
-        pre.next = cur;
-        // 重置
+        // 链接节点prev -> cur
+        cur.next = prev.next;
+        prev.next = cur;
         cur = next;
-        pre = helper;
+        // 重置prev，重新遍历
+        prev = dummy;
       }
-      return helper.next;
+      return dummy.next;
     }
+    
+  }
+
+  @Optimal
+  @Author(name = "Xing_", 
+      referenceUrls = "https://leetcode.com/problems/insertion-sort-list/discuss/46420/An-easy-and-clear-way-to-sort-(-O(1)-space-)/45957")
+  @Author(name = "zrythpzhl", significant = true, 
+      referenceUrls = "https://leetcode.com/problems/insertion-sort-list/discuss/46420/An-easy-and-clear-way-to-sort-(-O(1)-space-)/45974")
+  @Submission(date = "2019-05-20", status = Status.ACCEPTED,
+      runtime = 2, runtimeBeatRate = 98.80, memory = 37.8, memoryBeatRate = 87.09,
+      url = "https://leetcode.com/submissions/detail/230071106/")
+  @DerivedFrom(SolutionByDummyNode.class)
+  @Solution(timeComplexity = Complexity.O_N_POW_2, spaceComplexity = Complexity.O_1)
+  public static class SolutionByDummyNodeII implements InsertionSortList {
+
     /**
-     * 思路：与{@link #insertionSortListByFakeHead(ListNode)}一样，不同的是优化了对插入到tail的处理，
-     * 如果能够直接插入到tail节点，则不需要从head遍历到tail，节省了时间
-     * 时间复杂度：O(N^2) 对于部分有序节点 list复杂度为O(N)
-     * 空间复杂度：O(1)
-     * @param head
-     * @return
+     * 思路：
+     * <p>与{@link SolutionByDummyNode}唯一的不同在于：
+     * 对于插入节点后尝试使用上一次的插入位置节点开始比较，而不是简单的重新开始head比较。
+     * <p>对于有序的list时间复杂度：{@link Complexity#O_N}
+     * <p>实现：
+     * <ol>
+     * <li>保存上次插入的prev节点，不再直接在循环后简单的置为prev=dummy
+     * <li>在开始时判断{@code prev.val >= cur.val}。
+     * <li>如果为true，说明cur节点在prev前面，prev=dummy开始从头遍历
+     * <li>如果为false，说明cur节点在prev后面，直接从prev开始遍历，减少{@code dummy--->prev}遍历的时间
+     * <li>不一定需要使用{@code prev.next != null || prev.next.val >= cur.val}比较，因为while会保证后面的节点能够比较到，
+     * 该代码还需要检查null（dummy.next==null第一次遍历插入，后续都是非null）
+     * </ol>
      */
-    public ListNode insertionSortListByFakeHeadWithMax(ListNode head) {
-      // 虚拟的排序list nodes。取最大值用于比较tail
-      ListNode fakeHead = new ListNode(Integer.MIN_VALUE);
-      ListNode tail = fakeHead, cur = head;
-      while (cur != null) {
+    @Override
+    public ListNode insertionSortList(ListNode head) {
+      if (head == null || head.next == null)
+        return head;
+      final ListNode dummy = new ListNode(0);
+      ListNode prev = dummy;
+      for (ListNode cur = head; cur != null;) {
+        // 如果cur在上次插入的prev节点前，从dummy开始遍历寻找，否则在prev之后
+        if (prev.val >= cur.val)
+          prev = dummy;
+        // 找到cur节点插入位置prev
+        while (prev.next != null && prev.next.val < cur.val)
+          prev = prev.next;
         ListNode next = cur.next;
-        // 移除cur的后续节点
-        cur.next = null;
-        // 判断cur是否能直接插入最后
-        if (tail.val <= cur.val) {
-          tail.next = cur;
-          tail = cur;
-        }
-        // 遍历插入
-        else {
-          // 从fakeHead开始遍历查找
-          ListNode pre = fakeHead;
-          while (pre.next != null && pre.next.val < cur.val) {
-            pre = pre.next;
-          }
-          cur.next = pre.next;
-          pre.next = cur;
-        }
+        // 链接节点prev->cur
+        cur.next = prev.next;
+        prev.next = cur;
+        // 比较下一个
         cur = next;
       }
-      return fakeHead.next;
+      return dummy.next;
+    }
+  }
+  
+  @Author(name = "Han_V", significant = true, 
+      referenceUrls = "https://leetcode.com/problems/insertion-sort-list/discuss/46429/Thoughts-from-a-Google-interviewer")
+  @Submission(date = "2019-05-20", status = Status.ACCEPTED,
+      runtime = 1, runtimeBeatRate = 100, memory = 38.5, memoryBeatRate = 33.29,
+      url = "https://leetcode.com/submissions/detail/230074732/")
+  @Solution(timeComplexity = Complexity.O_LOG_N, spaceComplexity = Complexity.O_N)
+  public static class SolutionByArraySort implements InsertionSortList {
+
+    /**
+     * 思路：将链表排序转换为数组排序。再将排序的数组值修改回链表
+     */
+    @Override
+    public ListNode insertionSortList(ListNode head) {
+      // 获取数组大小
+      int nodeCount = 0;
+      for (ListNode cur = head; cur != null; cur = cur.next)
+        nodeCount++;
+      int[] vals = new int[nodeCount];
+      // 创建vals数组
+      int i = 0;
+      for (ListNode cur = head; cur != null; cur = cur.next)
+        vals[i++] = cur.val;
+      // 快速排序
+      Arrays.sort(vals);
+      // 修改node.val为有序的vals值
+      i = 0;
+      for (ListNode cur = head; cur != null; cur = cur.next)
+        cur.val = vals[i++]; 
+      return head;
     }
   }
 }
