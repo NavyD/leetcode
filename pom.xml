@@ -15,8 +15,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<useful.annotation.version>1.0.5-SNAPSHOT</useful.annotation.version>
-		<annotation.processor.version>0.0.3-SNAPSHOT</annotation.processor.version>
+		<useful.annotation.version>1.0.6-SNAPSHOT</useful.annotation.version>
+		<annotation.processor.version>0.0.4-SNAPSHOT</annotation.processor.version>
 	</properties>
 
 	<dependencies>
