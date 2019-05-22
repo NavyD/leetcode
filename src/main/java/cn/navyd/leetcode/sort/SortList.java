@@ -1,6 +1,7 @@
 package cn.navyd.leetcode.sort;
 
 import cn.navyd.annotation.leetcode.Author;
+import cn.navyd.annotation.leetcode.Optimal;
 import cn.navyd.annotation.leetcode.Problem;
 import cn.navyd.annotation.leetcode.Problem.Difficulty;
 import cn.navyd.annotation.leetcode.Problem.Tag;
@@ -41,6 +42,7 @@ public interface SortList {
 
   public ListNode sortList(ListNode head);
 
+  @Optimal
   @Author(name = "qinlei515", 
       referenceUrls = "https://leetcode.com/problems/sort-list/discuss/46712/Bottom-to-up(not-recurring)-with-o(1)-space-complextity-and-o(nlgn)-time-complextity/151523")
   @Author(name = "zdwu", significant = true,
@@ -162,58 +164,72 @@ public interface SortList {
       return cur;
     }
   }
-}
+  
+  @Author(name = "jeantimex", significant = true, 
+      referenceUrls = "https://leetcode.com/problems/sort-list/discuss/46714/Java-merge-sort-solution")
+  @Submission(date = "2019-05-22", runtime = 3, runtimeBeatRate = 97.35, memory = 38.8, memoryBeatRate = 99.51,
+    url = "https://leetcode.com/submissions/detail/230520224/")
+  @Submission(date = "2019-03-27", runtime = 3, runtimeBeatRate = 97.35, memory = 40.7, memoryBeatRate = 77.82,
+      url = "https://leetcode.com/submissions/detail/218038080/")
+  @Solution(timeComplexity = Complexity.O_N_LOG_N, spaceComplexity = Complexity.O_LOG_N)
+  public static class SolutionByMergeTD implements SortList {
 
-/**
- * 链表归并排序top down。 与数组下标mid分离子数组不同，将链表分离子链表需要遍历slow.next fast.next.next跳跃获取mid node然后mid
- * node.next=null切分。 时间复杂度：O(N log N) 空间复杂度：O(log N) 递归栈空间
- * 
- * @author navyd
- *
- */
-class SolutionSortListByMergeSortTD implements SortList {
-
-  public ListNode sortList(ListNode head) {
-    if (head == null || head.next == null)
-      return head;
-    ListNode prev = null, slow = head, fast = head;
-    // 将head链表对半分离，slow++ fast+=2导致对半分
-    while (fast != null && fast.next != null) {
-      prev = slow;
-      slow = slow.next;
-      fast = fast.next.next;
-    }
-    // head分离为prev slow两个链表
-    prev.next = null;
-    ListNode
-    // 不断分离left链表
-    left = sortList(head),
-        // 不断分离right链表
-        right = sortList(slow);
-    // 将两个链表归并并返回新链表head
-    return merge(left, right);
-  }
-
-  /**
-   * 归并两个链表并返回新链表的head
-   * 
-   * @param left
-   * @param right
-   * @return
-   */
-  private static ListNode merge(ListNode left, ListNode right) {
-    ListNode dummy = new ListNode(0), cur = dummy;
-    while (left != null && right != null) {
-      if (left.val < right.val) {
-        cur.next = left;
-        left = left.next;
-      } else {
-        cur.next = right;
-        right = right.next;
+    /**
+     * 思路：使用merge sort top down。标准的数组归并排序使用数组的{@code mid=(hi-lo)/2 + lo}下标，
+     * 将数组递归的分离由大到小size=1 {@code lo=mid}的数组，然后在栈空间由小到大归并数组。
+     * <p>链表的归并排序使用一个mid node将链表递归的由大到小分离为独立的子链表，然后不断的归并子链表
+     * <p>实现：
+     * <ol>
+     * <li>获取链表的mid节点使用*2的方式，即一个fast以slow两倍的数组迭代，当fast到达链表最后时，slow刚好在mid节点上。
+     * 如：[1,5,3]，初始化：slow=fast=1。第一次：slow=5,fast=3，fast.next=null迭代完成。slow=5即mid节点
+     * <li>在递归时使用prev指针保存slow即mid前一个node，分离链表，导致递归后（归并前）的链表被分离为一个个单节点
+     * <li>归并两个子链表后将新链表head返回，递归导致新链表不断被归并链接，最终单节点被合并为有序的链表
+     * </ol>
+     * 空间复杂度：由于{@link #merge(ListNode, ListNode)}使用一个节点head保存新链表，而递归的深度为log N，
+     * 则复杂度为O(log N)
+     */
+    @Override
+    public ListNode sortList(ListNode head) {
+      if (head == null || head.next == null)
+        return head;
+      // 分离链表
+      ListNode prev = null, slow = head, fast = head;
+      // 找到mid节点
+      while (fast != null && fast.next != null) {
+        prev = slow;
+        slow = slow.next;
+        fast = fast.next.next;
       }
-      cur = cur.next;
+      // 分离mid前后子链表
+      prev.next = null;
+      // 切分链表为单节点
+      ListNode left = sortList(head), 
+          right = sortList(slow);
+      // 合并链表
+      return merge(left, right);
     }
-    cur.next = left == null ? right : left;
-    return dummy.next;
+    
+    /**
+     * 归并两个链表并返回有序的新链表
+     * @param left
+     * @param right
+     * @return
+     */
+    static ListNode merge(ListNode left, ListNode right) {
+      final ListNode head = new ListNode(0);
+      ListNode cur = head;
+      while (left != null && right != null) {
+        if (left.val < right.val) {
+          cur.next = left;
+          left = left.next;
+        } else {
+          cur.next = right;
+          right = right.next;
+        }
+        cur = cur.next;
+      }
+      cur.next = left != null ? left : right;
+      return head.next;
+    }
   }
 }
