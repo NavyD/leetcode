@@ -15,7 +15,7 @@
 56   | [Merge Intervals](https://leetcode.com/problems/merge-intervals/)                                 | Medium | 2    | sort
 75   | [Sort Colors](https://leetcode.com/problems/sort-colors/)                                         | Medium | 2    | sort
 147  | [Insertion Sort List](https://leetcode.com/problems/insertion-sort-list/)                         | Medium | 2    | sort
-148  | [Sort List](https://leetcode.com/problems/sort-list/)                                             | Medium | 2    | sort
+148  | [Sort List](https://leetcode.com/problems/sort-list/)                                             | Medium | 3    | sort
 179  | [Largest Number](https://leetcode.com/problems/largest-number/)                                   | Medium | 1    | sort
 274  | [H-Index](https://leetcode.com/problems/h-index/)                                                 | Medium | 3    | sort
 324  | [Wiggle Sort II](https://leetcode.com/problems/wiggle-sort-ii/)                                   | Medium | 4    | sort

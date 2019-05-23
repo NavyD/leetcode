@@ -1,8 +1,10 @@
 package cn.navyd.leetcode.sort;
 
+import java.util.Arrays;
 import cn.navyd.annotation.leetcode.Author;
 import cn.navyd.annotation.leetcode.Optimal;
 import cn.navyd.annotation.leetcode.Problem;
+import cn.navyd.annotation.leetcode.Skilled;
 import cn.navyd.annotation.leetcode.Problem.Difficulty;
 import cn.navyd.annotation.leetcode.Problem.Tag;
 import cn.navyd.annotation.leetcode.Solution;
@@ -230,6 +232,43 @@ public interface SortList {
       }
       cur.next = left != null ? left : right;
       return head.next;
+    }
+  }
+
+  // 该方案不符合题意，使用的额外的数组O(N)
+  @Skilled
+  @Author(name = "navyd")
+  @Submission(date = "2019-05-23", runtime = 2, runtimeBeatRate = 99.76, memory = 40.1, memoryBeatRate = 95.75,
+      url = "https://leetcode.com/submissions/detail/230742666/")
+  @Solution(timeComplexity = Complexity.O_N_LOG_N, spaceComplexity = Complexity.O_N)
+  public static class SolutionByArraySort implements SortList {
+
+    /**
+     * 将链表转换为数组排序
+     */
+    @Override
+    public ListNode sortList(ListNode head) {
+      // 创建数组
+      final int length = getLength(head);
+      int[] vals = new int[length];
+      int i = 0;
+      // 赋值到数组
+      for (ListNode node = head; node != null; node = node.next)
+        vals[i++] = node.val;
+      // 排序 快速排序
+      Arrays.sort(vals);
+      // 修改链表
+      i = 0;
+      for (ListNode node = head; node != null; node = node.next)
+        node.val = vals[i++];
+      return head;
+    }
+    
+    static int getLength(ListNode head) {
+      int length = 0;
+      for (ListNode node = head; node != null; node = node.next)
+        length++;
+      return length;
     }
   }
 }
