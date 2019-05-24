@@ -34,6 +34,8 @@ public interface LargestNumber {
 
   public String largestNumber(int[] nums);
   
+  // 数学证明 没弄懂
+  @Author(name = "chellya", referenceUrls = "https://leetcode.com/problems/largest-number/discuss/53195/Mathematical-proof-of-correctness-of-sorting-method")
   @Author(name = "ran3", significant = true, 
       referenceUrls = "https://leetcode.com/problems/largest-number/discuss/53158/My-Java-Solution-to-share")
   @Submission(date = "2019-05-23", runtime = 35, runtimeBeatRate = 22.50, memory = 35.4, memoryBeatRate = 95.94,

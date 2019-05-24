@@ -4,13 +4,15 @@ import java.util.Arrays;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
+import cn.navyd.annotation.leetcode.Author;
+import cn.navyd.annotation.leetcode.DerivedFrom;
 import cn.navyd.annotation.leetcode.Optimal;
 import cn.navyd.annotation.leetcode.Problem;
 import cn.navyd.annotation.leetcode.Problem.Difficulty;
 import cn.navyd.annotation.leetcode.Problem.Tag;
 import cn.navyd.annotation.leetcode.Solution;
 import cn.navyd.annotation.leetcode.Solution.Complexity;
-import cn.navyd.annotation.leetcode.Solution.Status;
+import cn.navyd.annotation.leetcode.Submission;
 
 /**
  * <pre>
@@ -31,8 +33,8 @@ You may assume k is always valid, 1 ≤ k ≤ array's length.
  * @author navyd
  *
  */
-@Problem(number = 215, difficulty = Difficulty.MEDIUM, tags = Tag.HEAP, 
-url = "https://leetcode.com/problems/kth-largest-element-in-an-array/")
+@Problem(number = 215, difficulty = Difficulty.MEDIUM, tags = Tag.HEAP,
+    url = "https://leetcode.com/problems/kth-largest-element-in-an-array/")
 public interface KthLargestElementinanArray {
   /**
    * 从未排序的数组中找出第k大（不去重）的元素
@@ -43,12 +45,12 @@ public interface KthLargestElementinanArray {
    */
   public int findKthLargest(int[] nums, int k);
 
-  @Solution(status = Status.ACCEPTED, tags = Tag.SORT, 
-      spaceComplexity = Complexity.O_1, timeComplexity = Complexity.O_N_LOG_N, 
-      runtime = 3, runtimeBeatRate = 84.91, memory = 36.2, memoryBeatRate = 95.99, 
-      dates = "2019-05-08",
-      submissionUrl = "https://leetcode.com/submissions/detail/227467498/",
+  @Author(name = "jmnarloch", significant = true,
       referenceUrls = "https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/60294/Solution-explained")
+  @Submission(date = "2019-05-08", runtime = 3, runtimeBeatRate = 84.91, memory = 36.2,
+      memoryBeatRate = 95.99, url = "https://leetcode.com/submissions/detail/227467498/")
+  @Solution(tags = Tag.SORT, spaceComplexity = Complexity.O_1,
+      timeComplexity = Complexity.O_N_LOG_N)
   public static class SolutionBySort implements KthLargestElementinanArray {
     /**
      * 排序后直接访问数组最后第k个元素即可。适用于小数组
@@ -61,12 +63,11 @@ public interface KthLargestElementinanArray {
     }
   }
   
-  @Solution(status = Status.ACCEPTED, 
-      spaceComplexity = Complexity.O_N, timeComplexity = Complexity.O_N_LOG_N, 
-      runtime = 6, runtimeBeatRate = 63.22, memory = 36.9, memoryBeatRate = 94.64,
-      dates = "2019-05-08",
-      submissionUrl = "https://leetcode.com/submissions/detail/227582269/",
+  @Author(name = "jmnarloch", significant = true,
       referenceUrls = "https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/60294/Solution-explained")
+  @Submission(date = "2019-05-08", runtime = 6, runtimeBeatRate = 63.22, memory = 36.9,
+      memoryBeatRate = 94.64, url = "https://leetcode.com/submissions/detail/227582269/")
+  @Solution(spaceComplexity = Complexity.O_N, timeComplexity = Complexity.O_N_LOG_N)
   public static class SolutionByPriorityQueue implements KthLargestElementinanArray {
 
     /**
@@ -88,12 +89,11 @@ public interface KthLargestElementinanArray {
     }
   }
   
-  @Solution(status = Status.ACCEPTED, tags = Tag.SORT, 
-    spaceComplexity = Complexity.O_1, timeComplexity = Complexity.O_N, 
-    runtime = 5, runtimeBeatRate = 67.82, memory = 36.1, memoryBeatRate = 96.13,
-    dates = "2019-05-08",
-    submissionUrl = "https://leetcode.com/submissions/detail/227586012/",
-    referenceUrls = "https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/60294/Solution-explained")
+  @Author(name = "jmnarloch", significant = true,
+      referenceUrls = "https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/60294/Solution-explained")
+  @Submission(date = "2019-05-08", runtime = 5, runtimeBeatRate = 67.82, memory = 36.1,
+      memoryBeatRate = 96.13, url = "https://leetcode.com/submissions/detail/227586012/")
+  @Solution(tags = Tag.SORT, spaceComplexity = Complexity.O_1, timeComplexity = Complexity.O_N)
   public static class SolutionByPartition implements KthLargestElementinanArray {
 
     /**
@@ -150,14 +150,14 @@ public interface KthLargestElementinanArray {
   }
   
   @Optimal
-  @Solution(status = Status.ACCEPTED, tags = Tag.SORT, 
-      spaceComplexity = Complexity.O_1, timeComplexity = Complexity.O_N, 
-      runtime = 3, runtimeBeatRate = 84.91, memory = 36.4, memoryBeatRate = 95.45,
-      dates = "2019-05-08",
-      submissionUrl = "https://leetcode.com/submissions/detail/227588334/",
-      referenceUrls = {
-          "https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/60294/Solution-explained/267106",
-          "https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/60312/AC-Clean-QuickSelect-Java-solution-avg.-O(n)-time/61582"})
+  @Author(name = "cdai",
+      referenceUrls = "https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/60312/AC-Clean-QuickSelect-Java-solution-avg.-O(n)-time/61582")
+  @Author(name = "yuanb10", significant = true,
+      referenceUrls = "https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/60294/Solution-explained/267106")
+  @DerivedFrom(SolutionByPartition.class)
+  @Submission(date = "2019-05-08", runtime = 3, runtimeBeatRate = 84.91, memory = 36.4,
+      memoryBeatRate = 95.45, url = "https://leetcode.com/submissions/detail/227588334/")
+  @Solution(tags = Tag.SORT, spaceComplexity = Complexity.O_1, timeComplexity = Complexity.O_N)
   public static class SolutionByEasierPartition extends SolutionByPartition {
     /**
      * 一个简洁易读的partition。
