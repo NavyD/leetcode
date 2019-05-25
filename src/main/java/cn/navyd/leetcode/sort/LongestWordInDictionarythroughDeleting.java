@@ -3,12 +3,14 @@ package cn.navyd.leetcode.sort;
 import java.util.Arrays;
 import java.util.List;
 import cn.navyd.annotation.leetcode.Author;
+import cn.navyd.annotation.leetcode.Optimal;
 import cn.navyd.annotation.leetcode.Problem;
 import cn.navyd.annotation.leetcode.Solution;
 import cn.navyd.annotation.leetcode.Problem.Difficulty;
 import cn.navyd.annotation.leetcode.Problem.Tag;
 import cn.navyd.annotation.leetcode.Solution.Complexity;
 import cn.navyd.annotation.leetcode.Submission;
+import cn.navyd.annotation.leetcode.Unskilled;
 
 /**
  * <pre>
@@ -35,6 +37,7 @@ The length of all the strings in the input won't exceed 1,000.
  * @author navyd
  *
  */
+@Unskilled
 @Problem(number = 524, difficulty = Difficulty.MEDIUM, tags = Tag.SORT,
     url = "https://leetcode.com/problems/longest-word-in-dictionary-through-deleting/")
 public interface LongestWordInDictionarythroughDeleting {
@@ -46,8 +49,10 @@ public interface LongestWordInDictionarythroughDeleting {
    */
   public String findLongestWord(String s, List<String> d);
 
-  @Author(name = "compton_scatter", significant = true, referenceUrls = "https://leetcode.com/problems/longest-word-in-dictionary-through-deleting/discuss/99588/Short-Java-Solutions-Sorting-Dictionary-and-Without-Sorting")
-  @Submission(date = "2019-05-24", runtime = 51, runtimeBeatRate = 22.38, memory = 36.9, memoryBeatRate = 99.16, url = "https://leetcode.com/submissions/detail/230978469/")
+  @Author(name = "compton_scatter", significant = true,
+      referenceUrls = "https://leetcode.com/problems/longest-word-in-dictionary-through-deleting/discuss/99588/Short-Java-Solutions-Sorting-Dictionary-and-Without-Sorting")
+  @Submission(date = "2019-05-24", runtime = 51, runtimeBeatRate = 22.38, memory = 36.9,
+      memoryBeatRate = 99.16, url = "https://leetcode.com/submissions/detail/230978469/")
   @Solution(timeComplexity = Complexity.O_N_K, spaceComplexity = Complexity.O_N)
   public static class SolutionBySort implements LongestWordInDictionarythroughDeleting {
 
@@ -89,6 +94,52 @@ public interface LongestWordInDictionarythroughDeleting {
       }
       return "";
     }
+  }
+  
+  @Optimal
+  @Author(name = "hot13399",
+      referenceUrls = "https://leetcode.com/problems/longest-word-in-dictionary-through-deleting/discuss/99588/Short-Java-Solutions-Sorting-Dictionary-and-Without-Sorting/103703")
+  @Author(name = "compton_scatter", significant = true,
+      referenceUrls = "https://leetcode.com/problems/longest-word-in-dictionary-through-deleting/discuss/99588/Short-Java-Solutions-Sorting-Dictionary-and-Without-Sorting")
+  @Submission(date = "2019-05-25", runtime = 13, runtimeBeatRate = 93.62, memory = 39.8,
+      memoryBeatRate = 78.67, url = "https://leetcode.com/submissions/detail/231170569/")
+  @Solution(timeComplexity = Complexity.O_N_K, spaceComplexity = Complexity.O_K)
+  public static class SolutionByLongestWord implements LongestWordInDictionarythroughDeleting {
 
+    /**
+     * 思路：遍历找到最长、字符顺序最小的单词longestWord。如果遍历过程中遇到更好的，则更新longestWord
+     * <p>类似与冒泡排序，只不过从单一顺序变为了双重顺序，并且需要满足指定条件（单词能被顺序找到）
+     * <p>实现时注意：遍历的判断条件的顺序很重要，能够减少许多不必要的迭代遍历
+     * <p>空间复杂度：由于word.toCharArray()复制一个数组，假设字符串的平均长度为k，额外的空间为O(K)。
+     */
+    @Override
+    public String findLongestWord(String s, List<String> d) {
+      String longestWord = "";
+      final char[] sources = s.toCharArray();
+      for (String word : d) {
+        int diff = word.length() - longestWord.length();
+        // 仅当长度大于longestword 或 等于时 word小于longestword 尝试寻找新的最长单词
+        if ((diff > 0 || (diff == 0 && word.compareTo(longestWord) < 0))
+            // 单词在s中找到
+            && isSubsequence(sources, word.toCharArray())) {
+          longestWord = word;
+        }
+      }
+      return longestWord;
+    }
+    
+    /**
+     * 如果单词在s中顺序被找到，则返回true
+     * @param s
+     * @param words
+     * @return
+     */
+    static boolean isSubsequence(char[] s, char[] word) {
+      int i = 0;
+      for (char c : s)
+        if (i < word.length && word[i] == c)
+          i++;
+      return i == word.length;
+    }
   }
 }
