@@ -14,6 +14,8 @@ import cn.navyd.annotation.leetcode.Problem.Tag;
 import cn.navyd.annotation.leetcode.Solution;
 import cn.navyd.annotation.leetcode.Solution.Complexity;
 import cn.navyd.annotation.leetcode.Submission;
+import cn.navyd.annotation.leetcode.Submission.Status;
+import cn.navyd.annotation.leetcode.Unskilled;
 
 /**
  * <pre>
@@ -37,6 +39,7 @@ S will consist of lowercase letters and have length in range [1, 500].
  * @author navyd
  *
  */
+@Unskilled
 @Problem(number = 767, difficulty = Difficulty.MEDIUM, tags = Tag.SORT, url = "https://leetcode.com/problems/reorganize-string/")
 public interface ReorganizeString {
   /**
@@ -223,8 +226,7 @@ public interface ReorganizeString {
   
   
   @Author(name = "navyd")
-  // 编译异常 等待修复
-//  @Submission(date = "2019-05-25", status = Status.WRONG, url = "https://leetcode.com/submissions/detail/231179919/")
+  @Submission(date = "2019-05-25", status = Status.WRONG, url = "https://leetcode.com/submissions/detail/231179919/")
   @Solution(timeComplexity = Complexity.O_N_LOG_N, spaceComplexity = Complexity.O_N)
   public static class SolutionBySort implements ReorganizeString {
 
