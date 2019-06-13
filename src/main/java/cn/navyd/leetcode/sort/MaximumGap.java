@@ -2,12 +2,14 @@ package cn.navyd.leetcode.sort;
 
 import java.util.Arrays;
 import cn.navyd.annotation.leetcode.Author;
+import cn.navyd.annotation.leetcode.DerivedFrom;
 import cn.navyd.annotation.leetcode.Problem;
 import cn.navyd.annotation.leetcode.Problem.Difficulty;
 import cn.navyd.annotation.leetcode.Problem.Tag;
 import cn.navyd.annotation.leetcode.Solution;
 import cn.navyd.annotation.leetcode.Solution.Complexity;
 import cn.navyd.annotation.leetcode.Submission;
+import cn.navyd.annotation.leetcode.Unskilled;
 
 /**
  * <pre>
@@ -34,6 +36,7 @@ Try to solve it in linear time/space.
  * @author navyd
  *
  */
+@Unskilled
 @Problem(number = 164, difficulty = Difficulty.HARD, tags = Tag.SORT,
     url = "https://leetcode.com/problems/maximum-gap/")
 public interface MaximumGap {
@@ -146,6 +149,60 @@ public interface MaximumGap {
       maxGap = Math.max(maxGap, max - prevBucketMax);
       return maxGap;
     }
-    
   }
+  
+  @DerivedFrom(SolutionByBucketSort.class)
+  @Submission(date = "2019-06-13", memory = 36.4, memoryBeatRate = 99.61, runtime = 2, runtimeBeatRate = 99.32, url = "https://leetcode.com/submissions/detail/235587536/")
+  @Solution(spaceComplexity = Complexity.O_N, timeComplexity = Complexity.O_N)
+  public static class SolutionByBucketSortII implements MaximumGap {
+    /**
+     * 思路：相对于{@link SolutionByBucketSort}而言，最大的不同是，将min入桶，max不入桶。{@link SolutionByBucketSort}则是min,max都不入桶
+     * <p>由于buckets.length=n-1，gap=(max-min)/(n-1)，将max入桶时，idx = (max-min)/gap = n-1，数组上界溢出。
+     * min入桶时，idx=(min-min)/gap=0，正常。
+     * <p>假设buckets.length=n，保存max，那么最后一个桶只有一个元素max，最小最大值都是max
+     * <p>如果最大值也入桶，idx=n-1，需要数组长度为n，最小值入桶无影响。最后更新时使用max-prev是将虚拟的只有max的最后一个桶与buckets的最后的桶比较
+     */
+    @Override
+    public int maximumGap(int[] nums) {
+      if (nums.length < 2)
+        return 0;
+      final int n = nums.length;
+      // 寻找min, max
+      int min = nums[0], max = nums[0];
+      for (int num : nums) {
+        min = Math.min(min, num);
+        max = Math.max(max, num);
+      }
+      // 计算gap
+      final int gap = (int)Math.ceil(((double)max - min) / (n-1));
+      // 桶
+      final int[]
+          minBuckets = new int[n-1],
+          maxBuckets = new int[n-1];
+      Arrays.fill(minBuckets, Integer.MAX_VALUE);
+      Arrays.fill(maxBuckets, Integer.MIN_VALUE);
+      // 入桶
+      for (int num : nums) {
+        // max不入桶
+        if (num == max)
+          continue;
+        int i = (num - min) / gap;
+        minBuckets[i] = Math.min(num, minBuckets[i]);
+        maxBuckets[i] = Math.max(num, maxBuckets[i]);
+      }
+      // 计算桶间gap
+      int maxGap = Integer.MAX_VALUE, prev = min;
+      for (int i = 0; i < minBuckets.length; i++) {
+        // 空桶
+        if (maxBuckets[i] == Integer.MIN_VALUE)
+          continue;
+        maxGap = Math.max(maxGap, minBuckets[i] - prev);
+        prev = maxBuckets[i];
+      }
+      // 最后一个桶的最小值 最大值就是max
+      maxGap = Math.max(maxGap, max - prev);
+      return maxGap;
+    }
+  }
+  
 }
