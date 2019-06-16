@@ -1,5 +1,9 @@
 package cn.navyd.leetcode.sort;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.Arrays;
 import cn.navyd.annotation.leetcode.Author;
 import cn.navyd.annotation.leetcode.DerivedFrom;
@@ -205,4 +209,81 @@ public interface MaximumGap {
     }
   }
   
+  // 解释为何radixsort 后序重排
+  @Author(name = "HauserZ", referenceUrls = "https://leetcode.com/problems/maximum-gap/discuss/50642/Radix-sort-solution-in-Java-with-explanation/279550")
+  @Author(name = "Alexpanda", significant = true, referenceUrls = "https://leetcode.com/problems/maximum-gap/discuss/50642/Radix-sort-solution-in-Java-with-explanation")
+  @Submission(date = "2019-06-16", memory = 37.1, memoryBeatRate = 99.33, runtime = 5, runtimeBeatRate = 34.17, url = "https://leetcode.com/submissions/detail/236199369/")
+  @Solution(timeComplexity = Complexity.O_N, spaceComplexity = Complexity.O_N)
+  public static class SolutionByRadixSort implements MaximumGap {
+
+    /**
+     * 思路：使用基数排序将数组排序，使得时间空间复杂度在O(n)。排序后，则取相邻gap的最大值即可
+     * <p>
+     * 时间复杂度：由于int最多10位数字，最多while循环10次，while中最大遍历重排aux和nums为O(N)，所以，平均为O(N)
+     * <p>
+     * 空间复杂度：最大数组为aux为O(N)
+     */
+    @Override
+    public int maximumGap(int[] nums) {
+      if (nums.length < 2)
+        return 0;
+      // 10 radix sort
+      radixSort(nums, 10);
+      // 相邻max gap
+      int maxGap = Integer.MIN_VALUE;
+      for (int i = 1; i < nums.length; i++)
+        maxGap = Math.max(maxGap, nums[i] - nums[i-1]);
+      return maxGap;
+    }
+    
+    /**
+     * 对nums使用radix进制的基数排序
+     * <p>如果重排aux时，不使用后序遍历，前序遍历会导致丢失稳定性
+     * <pre>
+     * 如 [90,45,75,70]
+     * counts[0]=2 counts[5]=2
+     * aux[--counts[0]] = nums[0] ==> aux[1]=90 aux[0] = 70 ==> [70, 90,..]
+     * 显然与初始数组顺序[90, .., 70]不符
+     * </pre> 
+     */
+    void radixSort(int[] nums, int radix) {
+      // 获取max num
+      int maxNum = nums[0];
+      for (int num : nums)
+        maxNum = Math.max(maxNum, num);
+      
+      final int n = nums.length;
+      final int[] aux = new int[n];
+      // 1, 10, 100, 1000...
+      // 防止进制radix过大溢出
+      long exponent = 1;
+      // maxNum指数不为0 循环
+      while (maxNum / exponent > 0) {
+        // 计数
+        int[] counts = new int[radix];
+        for (int i = 0; i < n; i++)
+          counts[getDigit(nums[i], exponent, radix)]++;
+        // 统计每个计数的长度 即counts对应的nums下标位置
+        for (int i = 1; i < radix; i++)
+          counts[i] += counts[i - 1];
+        // 重排aux 将对应位数的顺序counts 对应到 整个nums，使nums当前digit有序 从后往前，保证稳定性
+        for (int i = n - 1; i >= 0; i--) {
+          int idx = --counts[getDigit(nums[i], exponent, radix)];
+          aux[idx] = nums[i];
+        }
+        // 重排nums
+        for (int i = 0; i < n; i++)
+          nums[i] = aux[i];
+        // 指数步进
+        exponent *= radix;
+      }
+    }
+    
+    /**
+     * 获取指定num在指数exp下的radix数字。如15的exp=1的10进制数为5，exp=10则为1.若exp=1,为16进制则为15(f)
+     */
+    int getDigit(int num, long exp, int radix) {
+      return (int)(num / exp) % radix;
+    }
+  }
 }
