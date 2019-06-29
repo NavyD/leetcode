@@ -1,9 +1,5 @@
 package cn.navyd.leetcode.sort;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.Arrays;
 import cn.navyd.annotation.leetcode.Author;
 import cn.navyd.annotation.leetcode.DerivedFrom;
