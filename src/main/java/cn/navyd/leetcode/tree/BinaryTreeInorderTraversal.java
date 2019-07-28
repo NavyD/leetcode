@@ -105,8 +105,7 @@ public interface BinaryTreeInorderTraversal {
     /**
      * Morris Traversal 方法：structure-Threaded Binary Tree 将树构造成线索二叉树结构
      * <p>
-     * 思路：
-     * 将原本为null的right引用指向该节点的在in-order序列上的后继successor，将原本为null的left引用指向该节点的in-order序列的前继predecessor
+     * 思路：将原本为null的right引用指向该节点的在in-order序列上的后继successor，将原本为null的left引用指向该节点的in-order序列的前继predecessor
      * <pre>
      X
    /   \
@@ -114,8 +113,11 @@ public interface BinaryTreeInorderTraversal {
  / \   / \
 A   B C   D
      * </pre>
+     * <p>right指向后继，root.right在in-order顺序本身就是后继，但是当root.right!=null存在子节点时必须根据in-order先访问了子节点left。
+     * 如果right==null不存在子节点，下一个访问的是root父节点（root在左边）或完成遍历
      * <p>right指向后继容易理解，子树root.left != null说明要遍历root需要将left子树遍历完，即可以将root连接到left.mostRight.root (mostRight表示最深的右子树节点)
-     * <p>left指向predecessor不好理解是因为总是想着最前的A，A没有predecessor，left=null只有当root=Z，root.left=C时left存在前继X
+     * <p>left指向predecessor不好理解是因为in-order最左节点A是没有predecessor，但是无论root这棵树是在哪个节点的子树中，访问了root节点的父节点（前继）后，要访问这棵树，必须访问root.left（后继）,
+     * left引用就指向前继（首先被访问）。left=null只有当root=Z，root.left=C时left存在前继X
      * <pre>
  A
   \
