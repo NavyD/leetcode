@@ -15,22 +15,14 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<useful.annotation.version>1.0.7-SNAPSHOT</useful.annotation.version>
-		<annotation.processor.version>0.0.5-SNAPSHOT</annotation.processor.version>
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>cn.navyd</groupId>
-			<artifactId>useful-annotation</artifactId>
-			<version>${useful.annotation.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>cn.navyd</groupId>
-			<artifactId>annotation-processor</artifactId>
-			<version>${annotation.processor.version}</version>
-			<scope>compile</scope>
-		</dependency>
+		            <dependency>
+            <groupId>cn.navyd</groupId>
+            <artifactId>leetcode-annotation</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 	</dependencies>
 
 	<build>

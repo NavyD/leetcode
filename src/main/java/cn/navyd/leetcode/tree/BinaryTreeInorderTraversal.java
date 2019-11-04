@@ -169,7 +169,6 @@ A   B C   D
       }
       return result;
     }
-    
   }
   
   public static class SolutionByIterativeError implements BinaryTreeInorderTraversal {
