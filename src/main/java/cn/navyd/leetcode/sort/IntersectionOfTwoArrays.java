@@ -1,12 +1,8 @@
 package cn.navyd.leetcode.sort;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -57,14 +53,21 @@ public interface IntersectionOfTwoArrays {
    */
   public int[] intersection(int[] nums1, int[] nums2);
 
-  public static class SolutionByHash implements IntersectionOfTwoArrays {
+  @Submission(memory = 36.8, memoryBeatRate = 89.19, runtime = 2, runtimeBeatRate = 97.05, submittedDate = @DateTime("20191121"), url = "https://leetcode.com/submissions/detail/280475605/")
+  @Author(value = "divingboy89", references = "https://leetcode.com/problems/intersection-of-two-arrays/discuss/81969/Three-Java-Solutions")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N), spaceComplexity = ComplexityEnum.O_N)
+  public static class SolutionByHashMap implements IntersectionOfTwoArrays {
 
     /**
      * <p>
      * 查找：要想找到O(1) hash是首选，注意int hash不会存在冲突出链表，保证是O(1)
      * <p>
      * 去重：hashmap每个键映射boolean，保证一次add
-     * 
+     * <p>复杂度
+     * <ul>
+     * <li>时间：int类型在hashset中不会出现碰撞，即保证hash查找O(1)，最大的迭代为O(N)</li>
+     * <li>空间：创建hashset, 结果数组intersectionNums, copy返回均为O(N)</li>
+     * </ul>
      */
     @Override
     public int[] intersection(int[] nums1, int[] nums2) {
@@ -86,10 +89,7 @@ public interface IntersectionOfTwoArrays {
           nums.put(n, false);
         }
       }
-      int[] res = new int[idx];
-      for (int i = 0; i < res.length; i++)
-        res[i] = intersectionNums[i];
-      return res;
+      return Arrays.copyOf(intersectionNums, idx);
     }
 
   }
@@ -97,7 +97,7 @@ public interface IntersectionOfTwoArrays {
   @Author(value = "divingboy89", references = "https://leetcode.com/problems/intersection-of-two-arrays/discuss/81969/Three-Java-Solutions")
   @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N), spaceComplexity = ComplexityEnum.O_N)
   @Submission(memory = 37.4, memoryBeatRate = 71.62, runtime = 1, runtimeBeatRate = 99.73, submittedDate = @DateTime("20191114"), url = "https://leetcode.com/submissions/detail/278607157/")
-  public static class SolutionByHashII implements IntersectionOfTwoArrays {
+  public static class SolutionByHashSet implements IntersectionOfTwoArrays {
 
     /**
      * 思路：
