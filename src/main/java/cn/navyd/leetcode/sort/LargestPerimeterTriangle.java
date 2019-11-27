@@ -2,6 +2,15 @@ package cn.navyd.leetcode.sort;
 
 import java.util.Arrays;
 
+import cn.navyd.annotation.algorithm.ComplexityEnum;
+import cn.navyd.annotation.algorithm.SortAlgorithm;
+import cn.navyd.annotation.algorithm.TimeComplexity;
+import cn.navyd.annotation.leetcode.Author;
+import cn.navyd.annotation.leetcode.DateTime;
+import cn.navyd.annotation.leetcode.DifficultyEnum;
+import cn.navyd.annotation.leetcode.Problem;
+import cn.navyd.annotation.leetcode.Submission;
+
 /**
  * Given an array A of positive lengths, return the largest perimeter of a triangle with non-zero
  * area, formed from 3 of these lengths.
@@ -28,52 +37,49 @@ import java.util.Arrays;
  * @author navyd
  *
  */
-public class LargestPerimeterTriangle {
-  // 该方法虽然能够给正确的accept，但是对三角形的性质不清楚，无法做出正确的方法
+@Problem(difficulty = DifficultyEnum.EASY, number = 976)
+public interface LargestPerimeterTriangle {
   /**
-   * 思路：先将数组排序，然后从最大元素开始遍历，查找三个元素是否满足三角形定义：任意两边和大于第三边 对于三角形的性质
-   * 然后不断查找最大的周长。
-   * 
-   * @param A
-   * @return
+   * 思路:
+   * <p>
+   * 三角形边长条件: 如果a<=b<=c,则a+b>c 才能构成三角形。那么对于确定大小关系的三个数，只需要1个条件就能满足：a+b>c。
+   * 否则可能需要测试三个条件a+b a+c b+c。
+   * <p>要求最大周长，找满足三角形最大的三个边长即可
+   * <p>如何找最大值
+   * <li>完整排序
+   * <li>排序中，满足条件后不需要剩下的值。可用的算法：bubble, selection, max heap, 
    */
-  public int largestPerimeter(int[] A) {
-    // 排序
-    Arrays.sort(A);
-    int maxPerimeter = 0;
-    final int len = A.length;
-    for (int i = len - 3; i >= 0; i--) {
-      final int a = A[i], b = A[i + 1], c = A[i + 2];
-      final int perimeter;
-      if (isTriangle(a, b, c) && maxPerimeter < (perimeter = a + b + c))
-        maxPerimeter = perimeter;
-    }
-    return maxPerimeter;
-  }
+  public int largestPerimeter(int[] A);
 
-  static boolean isTriangle(int a, int b, int c) {
-    return (a + b) > c;
-  }
+  @Submission(memory = 39.3, memoryBeatRate = 100, runtime = 9, runtimeBeatRate = 99.44, submittedDate = @DateTime("20191127"), url = "https://leetcode.com/submissions/detail/281940029/")
+  @Author(value = "awice", references = "https://leetcode.com/problems/largest-perimeter-triangle/solution/")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N_LOG_N), spaceComplexity = ComplexityEnum.O_1)
+  public static class SolutionBySort implements LargestPerimeterTriangle {
 
-  static class Solution {
     /**
-     * 思路：先将数组排序，然后从最大元素开始遍历，查找三个元素是否满足三角形定义：任意两边和大于第三边 
-     * 对于三角形的性质：
-     * <pre>
-     * A[n-1] < A[n-2] + A[n-3] 
-     * A[n-1] >= A[n-2] + A[n-3] >= A[i] + A[j]，不能从A[n-1]后续所有元素组合为三角形
-     * </pre>
-     * 时间复杂度：O(NlgN) 用于排序
-     * 空间复杂度：O(1)
-     * @param A
-     * @return
+     * 思路：完整排序找出大小关系
      */
-    public int largestPerimeterBySort(int[] A) {
+    @Override
+    public int largestPerimeter(int[] A) {
+      // 0. sort
       Arrays.sort(A);
-      for (int i = A.length - 1; i > 1; --i)
-        if (A[i] < A[i - 1] + A[i - 2])
-          return A[i] + A[i - 1] + A[i - 2];
+      // 1. find max perimeter with reverse traverse
+      for (int i = A.length - 1; i >= 2; i--)
+        // 2. max < others sum
+        if (A[i] < A[i-1] + A[i-2])
+          return A[i] + A[i-1] + A[i-2];
       return 0;
     }
+    
+  }
+
+  public static class SolutionByBubble implements LargestPerimeterTriangle {
+
+    @Override
+    public int largestPerimeter(int[] A) {
+      // TODO Auto-generated method stub
+      return 0;
+    }
+    
   }
 }
