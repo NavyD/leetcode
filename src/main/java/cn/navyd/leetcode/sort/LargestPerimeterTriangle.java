@@ -73,13 +73,85 @@ public interface LargestPerimeterTriangle {
     
   }
 
-  public static class SolutionByBubble implements LargestPerimeterTriangle {
+  @Author(value = "老虎", references = "https://leetcode-cn.com/problems/largest-perimeter-triangle/solution/mou-pao-jie-da-by-lao-hu-8/")
+  @Submission(memory = 39.7, memoryBeatRate = 100, runtime = 6, runtimeBeatRate = 99.63, submittedDate = @DateTime("20191128"), url = "https://leetcode.com/submissions/detail/282168560/")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(best = ComplexityEnum.O_1, worst = ComplexityEnum.O_N_POW_2), spaceComplexity = ComplexityEnum.O_1, inplace = true, stability = true)
+  public static class SolutionByBubbleSort implements LargestPerimeterTriangle {
 
+    /**
+     * 思路：在bubble sort过程中找出满足最大周长条件的3个最大值
+     * <pre>
+     * Process:
+     * 
+     * while count++ < A.length: 
+     *  while i++ < A.length:
+     *    if A[i] < A[i-1] then swap i, j
+     *  if count > 2 and A[cur_max] < A[cur_max-1] + A[cur_max-2] then
+     *    find Largest Perimeter Triangle
+     * </pre>
+     * <p>复杂度
+     * <ul>
+     * <li>时间：冒泡排序为O(N^2)，存在的最好的情况是3次for后刚好max perimeter满足条件即O(1)，最差是所有的都不满足为O(N^2)
+     * <li>空间：O(1)
+     * </ul>
+     */
     @Override
     public int largestPerimeter(int[] A) {
-      // TODO Auto-generated method stub
+      // 0. 遍历n次
+      int count = A.length;
+      while (count-- > 0) {
+        // 1. 比较相邻两个值大小，大的移动后面
+        for (int i = 1; i < A.length; i++) {
+          if (A[i] < A[i-1])
+            swap(A, i, i-1);
+        }
+        // 2. 存在3个最大值后则开始取最大周长
+        if (A.length - count > 2 && A[count] + A[count+1] > A[count+2])
+          return A[count] + A[count+1] + A[count+2];
+      }
       return 0;
     }
-    
+
+    private static void swap(int[] a, int i, int j) {
+      int temp = a[i];
+      a[i] = a[j];
+      a[j] = temp;
+    }
+  }
+
+  @Author("navyd")
+  @Submission(memory = 39.1, memoryBeatRate = 100, runtime = 4, runtimeBeatRate = 99.72, submittedDate = @DateTime("20191128"), url = "https://leetcode.com/submissions/detail/282209580/")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(best = ComplexityEnum.O_1, worst = ComplexityEnum.O_N_POW_2), spaceComplexity = ComplexityEnum.O_1, inplace = true, stability = true)
+  public static class SolutionBySelectionSort implements LargestPerimeterTriangle {
+    /**
+     * 思路：selection sort过程中找最大的三个边长。
+     * <p>复杂度
+     * <p>时间：情况与{@linkplain LargestPerimeterTriangle.SolutionByBubbleSort#largestPerimeter(int[]) SolutionByBubbleSort}一致
+     * <p>空间：O(1)
+     */
+    @Override
+    public int largestPerimeter(int[] A) {
+      // 0. traversal from last
+      int lastIdx = A.length;
+      while (lastIdx-- > 0) {
+        int maxIdx = 0;
+        // 1. find max index for each traversal
+        for (int i = 1; i <= lastIdx; i++)
+          if (A[maxIdx] < A[i])
+            maxIdx = i;
+        // 2. swap max index and cur index
+        swap(A, lastIdx, maxIdx);
+        // 3. check Perimeter condition, if find frequency>=3
+        if (A.length - lastIdx >= 3 && A[lastIdx] + A[lastIdx+1] > A[lastIdx+2])
+          return A[lastIdx] + A[lastIdx+1] + A[lastIdx+2];
+      }
+      return 0;
+    }
+
+    private static void swap(int[] a, int i, int j) {
+      int temp = a[i];
+      a[i] = a[j];
+      a[j] = temp;
+    }
   }
 }
