@@ -46,8 +46,11 @@ public interface LargestPerimeterTriangle {
    * 否则可能需要测试三个条件a+b a+c b+c。
    * <p>要求最大周长，找满足三角形最大的三个边长即可
    * <p>如何找最大值
+   * <ul>
    * <li>完整排序
-   * <li>排序中，满足条件后不需要剩下的值。可用的算法：bubble, selection, max heap, 
+   * <li>排序中，满足条件后不需要剩下的值。可用的算法：bubble, selection 
+   * </ul>
+   * <p>为何heap sort不能满足：仅sink操作构造的堆：结点>=两个子结点，无法保证最大的三个边相加。如果使用sink排序那就是完整的排序了
    */
   public int largestPerimeter(int[] A);
 
@@ -128,6 +131,7 @@ public interface LargestPerimeterTriangle {
      * <p>复杂度
      * <p>时间：情况与{@linkplain LargestPerimeterTriangle.SolutionByBubbleSort#largestPerimeter(int[]) SolutionByBubbleSort}一致
      * <p>空间：O(1)
+     * <p>可选优化：去除边界条件{@code A.length - lastIdx >= 3}，先找3个最大的到A最后
      */
     @Override
     public int largestPerimeter(int[] A) {
