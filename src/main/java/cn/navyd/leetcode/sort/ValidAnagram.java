@@ -9,7 +9,6 @@ import cn.navyd.annotation.algorithm.SortAlgorithm;
 import cn.navyd.annotation.algorithm.TimeComplexity;
 import cn.navyd.annotation.leetcode.Author;
 import cn.navyd.annotation.leetcode.DateTime;
-import cn.navyd.annotation.leetcode.DateTimeFormat;
 import cn.navyd.annotation.leetcode.DifficultyEnum;
 import cn.navyd.annotation.leetcode.Problem;
 import cn.navyd.annotation.leetcode.Submission;
@@ -47,7 +46,7 @@ public interface ValidAnagram {
    * <ul>
    * <li>hash/count查找O(1)：将char作为key/index，出现次数为value
    * <li>full sort O(n log n)：排序后比较index对应一致
-   * <li>half sort O(N)：排序中比较index一致
+   * <li>half sort O(N)：排序中比较index一致。多线程可以实现这个分布式算法
    * </ul>
    * @param s
    * @param t
@@ -112,69 +111,25 @@ public interface ValidAnagram {
     }
   }
 
-  /**
-   * 解决方案1： 将字符串s,t转换为char[]，然后排序，比较这两个char[]对应下标char是否相等。
-   * 
-   * @author navyd
-   *
-   */
-  static class MyFirstSolution {
+  @Author("navyd")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N_LOG_N), spaceComplexity = ComplexityEnum.O_1)
+  @Submission(memory = 37.3, memoryBeatRate = 94.19, runtime = 8, runtimeBeatRate = 32.22, submittedDate = @DateTime("20191202"), url = "https://leetcode.com/submissions/detail/283118033/")
+  public static class SolutionBySort implements ValidAnagram {
+    /**
+     * 思路：排序比较index是否一致
+     */
+    @Override
     public boolean isAnagram(String s, String t) {
       if (s.length() != t.length())
         return false;
-      char[] sourceChars = s.toCharArray(), targetChars = t.toCharArray();
-      Arrays.sort(sourceChars);
-      Arrays.sort(targetChars);
-      final int length = sourceChars.length;
-      for (int i = 0; i < length; i++)
-        if (sourceChars[i] != targetChars[i])
-          return false;
-      return true;
-    }
-  }
-
-  // 不同的解决方案
-
-  /**
-   * 与我的一致
-   * 
-   * @author navyd
-   *
-   */
-  static class SortingSolution {
-    public boolean isAnagram(String s, String t) {
-      if (s.length() != t.length()) {
-        return false;
-      }
-      char[] str1 = s.toCharArray();
-      char[] str2 = t.toCharArray();
-      Arrays.sort(str1);
-      Arrays.sort(str2);
-      return Arrays.equals(str1, str2);
-    }
-  }
-
-  /**
-   * 使用Hash table，使用一个长度为26的int[]，对于每个出现的char则相对与'a'的int值count++，即记录指定char出现的次数。
-   * 对于另一个字符串，则count--，如果两个字符串出现的char相同，则最后所有的count为0.否则一定不同
-   * @author navyd
-   *
-   */
-  static class HashTableSolution {
-    boolean isAnagramWithHash(String s, String t) {
-      if (s.length() != t.length())
-        return false;
-      // 26个小写字母
-      char[] counter = new char[26];
-      int length = s.length();
-      // 最小字符
-      char minChar = 'a';
-      for (int i = 0; i < length; i++) {
-        counter[s.charAt(i) - minChar]++;
-        counter[t.charAt(i) - minChar]--;
-      }
-      for (int count : counter)
-        if (count != 0)
+      // 0. sort
+      final char[] sa = s.toCharArray(),
+        ta = t.toCharArray();
+      Arrays.sort(sa);
+      Arrays.sort(ta);
+      // 1. compare to index
+      for (int i = 0; i < s.length(); i++)
+        if (sa[i] != ta[i])
           return false;
       return true;
     }
