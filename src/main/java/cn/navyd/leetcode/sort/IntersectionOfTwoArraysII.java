@@ -1,9 +1,17 @@
 package cn.navyd.leetcode.sort;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
+
+import cn.navyd.annotation.algorithm.ComplexityEnum;
+import cn.navyd.annotation.algorithm.SortAlgorithm;
+import cn.navyd.annotation.algorithm.TimeComplexity;
+import cn.navyd.annotation.leetcode.Author;
+import cn.navyd.annotation.leetcode.DateTime;
+import cn.navyd.annotation.leetcode.DifficultyEnum;
+import cn.navyd.annotation.leetcode.Problem;
+import cn.navyd.annotation.leetcode.Submission;
 
 /**
  * <pre>
@@ -31,77 +39,130 @@ What if elements of nums2 are stored on disk, and the memory is limited such tha
  * @author navyd
  *
  */
-public class IntersectionOfTwoArraysII {
-  // 写不出
-  public int[] intersect(int[] nums1, int[] nums2) {
-    return null;
-  }
-}
-
-
-class Solution {
+@Problem(difficulty = DifficultyEnum.EASY, number = 350)
+public interface IntersectionOfTwoArraysII {
   /**
-   * 通过hash记录一个数组的元素出现次数，另一个数组元素出现则减去hash次数，保证不多不少匹配
+   * 思路：取交集，结果与元素次数一致。那么hash计数首先想到
+   * 这个也就转为查找、统计的问题
+   * <p>
+   * 查找可行方案：
+   * <ul>
+   * <li>hash
+   * <li>binary search：注意统计不可行，无法保证区别重复查找
+   * <li>two pointers
+   * </ul>
+   * <p>follow up
+   * <p>如果array已有序：对于仅一个有序时，使用binary search，复杂度O(N log K).都有序时使用two pointers，复杂度为O(N+K)
+   * <p>如果有小的nums：对于Hash minNums，可以更小的空间。
+   * <p>如果内存不足，考虑归并排序
+   * 
    * @param nums1
    * @param nums2
    * @return
    */
-  public int[] intersectByHash(int[] nums1, int[] nums2) {
-    HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
-    ArrayList<Integer> result = new ArrayList<Integer>();
-    for (int i = 0; i < nums1.length; i++) {
-      if (map.containsKey(nums1[i]))
-        map.put(nums1[i], map.get(nums1[i]) + 1);
-      else
-        map.put(nums1[i], 1);
-    }
+  public int[] intersect(int[] nums1, int[] nums2);
 
-    for (int i = 0; i < nums2.length; i++) {
-      if (map.containsKey(nums2[i]) && map.get(nums2[i]) > 0) {
-        result.add(nums2[i]);
-        map.put(nums2[i], map.get(nums2[i]) - 1);
-      }
-    }
-
-    int[] r = new int[result.size()];
-    for (int i = 0; i < result.size(); i++) {
-      r[i] = result.get(i);
-    }
-
-    return r;
-  }
-
-  /**
-   * 将两个数组排序，依次比较两个数组的元素，如果相等则存入结果数组
-   * @param nums1
-   * @param nums2
-   * @return
-   */
-  public int[] intersectBySort(int[] nums1, int[] nums2) {
-    Arrays.sort(nums1);
-    Arrays.sort(nums2);
-    List<Integer> result = new ArrayList<>();
-    {
-      int i = 0, j = 0;
-      while (i < nums1.length && j < nums2.length) {
-        // 需要依次比较每个元素
-        int n1 = nums1[i], n2 = nums2[j];
-        if (n1 < n2)
-          i++;
-        else if (n1 > n2)
-          j++;
-        else {
-          result.add(n1);
-          // 相等的元素则比较后面的元素
-          i++;
-          j++;
+  @Author("navyd")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_K), spaceComplexity = ComplexityEnum.O_N)
+  @Submission(memory = 36.2, memoryBeatRate = 83.87, runtime = 2, runtimeBeatRate = 91.46, submittedDate = @DateTime("20191206"), url = "https://leetcode.com/submissions/detail/284008214/")
+  public static class SolutionByHash implements IntersectionOfTwoArraysII {
+    /**
+     * 思路：hash计数
+     * <p>优化：对于hash minNums可以使空间复杂度更小O(K)，时间还是O(N)
+     */
+    @Override
+    public int[] intersect(int[] nums1, int[] nums2) {
+      // 0. count for min nums
+      final int[] maxNums = nums1.length > nums2.length ? nums1 : nums2,
+          minNums = maxNums != nums1 ? nums1 : nums2;
+      final Map<Integer, Integer> counts = new HashMap<>(minNums.length);
+      for (int n : minNums)
+        counts.put(n, counts.getOrDefault(n, 0)+1);
+      int[] res = new int[minNums.length];
+      int i = 0;
+      // 1. find intersection
+      for(int n : maxNums) {
+        Integer count = counts.get(n);
+        // 2. check existence
+        if (count != null && count > 0) {
+          // 3. decrease count if exists
+          res[i++] = n;
+          counts.put(n, count-1);
         }
       }
+      return Arrays.copyOf(res, i);
     }
-    int[] r = new int[result.size()];
-    for (int k = 0; k < result.size(); k++) {
-      r[k] = result.get(k);
+  }
+
+  @Submission(memory = 36.6, memoryBeatRate = 83.87, runtime = 1, runtimeBeatRate = 100, submittedDate = @DateTime("20191206"), url = "https://leetcode.com/submissions/detail/284022925/")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N_LOG_N), spaceComplexity = ComplexityEnum.O_N)
+  public static class SolutionByTwoPointers implements IntersectionOfTwoArraysII {
+    /**
+     * 思路：two pointers
+     */
+    @Override
+    public int[] intersect(int[] nums1, int[] nums2) {
+      // 0. sort both
+      Arrays.sort(nums1);
+      Arrays.sort(nums2);
+      int[] res = new int[Math.min(nums1.length, nums2.length)];
+      // res index
+      int k = 0;
+      // 1. find with two pointers
+      int i = 0, j = 0;
+      while (i < nums1.length && j < nums2.length) {
+        if (nums1[i] < nums2[j])
+          i++;
+        else if (nums1[i] > nums2[j])
+          j++;
+        else {
+          res[k++] = nums1[i];
+          i++;j++;
+        }
+      }
+      return Arrays.copyOf(res, k);
     }
-    return r;
+  }
+
+  public static class SolutionByBinarySearch implements IntersectionOfTwoArraysII {
+    /**
+     * binary search方案不可行：存在重复查找的可能
+     * <pre>
+[3,1,2]
+[1,1]
+Output
+[1,1]
+Expected
+[1]
+     * </pre>
+     */
+    @Override
+    public int[] intersect(int[] nums1, int[] nums2) {
+      // 0. sort max nums
+      final int[] maxNums = nums1.length > nums2.length ? nums1 : nums2,
+        minNums = maxNums != nums1 ? nums1 : nums2;
+      Arrays.sort(maxNums);
+      int[] res = new int[minNums.length];
+      int i = 0;
+      // 1. find nums with binary search
+      for (int n : minNums)
+        if (binarySearch(maxNums, n) >= 0)
+          res[i++] = n;
+      return Arrays.copyOf(res, i);
+    }
+
+    static int binarySearch(int[] nums, int val) {
+      int hi = nums.length - 1, lo = 0;
+      while (lo <= hi) {
+        int mid = (hi+lo)/2;
+        if (nums[mid] < val) {
+          lo = mid + 1;
+        } else if (nums[mid] > val)
+          hi = mid - 1;
+        else 
+          return mid;
+      }
+      return -1;
+    }
   }
 }
