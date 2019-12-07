@@ -53,7 +53,7 @@ public interface SortArrayByParityII {
   @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N), spaceComplexity = ComplexityEnum.O_N, inplace = false)
   @Submission(memory = 41.7, memoryBeatRate = 81.48, runtime = 2, runtimeBeatRate = 99.68, submittedDate = @DateTime("20190921"), 
   url = "https://leetcode.com/submissions/detail/262767574/")
-  public class SortArrayByParityIIByIterative implements SortArrayByParityII {
+  public class SolutionByTwoPass implements SortArrayByParityII {
     /**
      * 思路：遍历数组，当元素为奇数时，保存新数组的奇数位置，反之亦然。
      * @param A
@@ -84,7 +84,7 @@ public interface SortArrayByParityII {
   @Submission(memory = 40.3, memoryBeatRate = 100, runtime = 2, runtimeBeatRate = 99.66, submittedDate = @DateTime("20190922"), 
       url = "https://leetcode.com/submissions/detail/263022300/")
   @SortAlgorithm(spaceComplexity = ComplexityEnum.O_1, timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N), inplace = true, inputDependency = true)
-  public class SortArrayByParityIIByOddEvenSwap implements SortArrayByParityII {
+  public class SolutionBySwap implements SortArrayByParityII {
 
     /**
      * 思想：原地排序，swap。该算法利用了数组A的特殊性：A.length%2=0, 奇偶元素各一半，swap保证才能有效
@@ -132,6 +132,35 @@ public interface SortArrayByParityII {
           oIdx += 2;
         } else
           eIdx += 2;
+      }
+      return A;
+    }
+  }
+
+  @Author("navyd")
+  @Author(value = "1", references = "https://leetcode.com/submissions/api/detail/958/java/1/")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N), spaceComplexity = ComplexityEnum.O_1)
+  @Submission(memory = 40.8, memoryBeatRate = 100, runtime = 1, runtimeBeatRate = 100, submittedDate = @DateTime("20191207"), url = "https://leetcode.com/submissions/detail/284251305/")
+  public static class SolutionBySwapII implements SortArrayByParityII {
+    /**
+     * 如果奇数位置出现偶数，则在偶数位置找奇数swap
+     * <p>优化：去除边界条件for o < A.length, while o < A.length，由于奇偶数量是对称的，只要出现偶数位置出现一个
+     * 奇数，则必定奇数位置有一个偶数
+     */
+    @Override
+    public int[] sortArrayByParityII(int[] A) {
+      // 0. traversal
+      for (int e = 0, o = 1; e < A.length; e += 2) {
+        // 1. 如果偶数位置是奇数
+        if ((A[e] & 1) == 0)
+          continue;
+        // 2. 找奇数位置的偶数
+        while ((A[o] & 1) == 1)
+          o += 2;
+        // 3. swap e and o
+        int temp = A[e];
+        A[e] = A[o];
+        A[o] = temp;
       }
       return A;
     }
