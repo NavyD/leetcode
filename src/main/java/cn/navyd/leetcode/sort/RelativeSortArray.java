@@ -93,15 +93,15 @@ public interface RelativeSortArray {
      * </ul>
      */
     @Override
-    public int[] relativeSortArray(int[] arr1, int[] arr2) {
+    public int[] relativeSortArray(final int[] arr1, final int[] arr2) {
       // 1.create counts and counting by hash arr1
       final Map<Integer, Integer> counts = new HashMap<>(arr1.length);
-      for (int n : arr1)
+      for (final int n : arr1)
         counts.put(n, counts.getOrDefault(n, 0) + 1);
       // arr1 idx for sorting
       int i = 0;
       // 2.sorting by arr2
-      for (int n : arr2) {
+      for (final int n : arr2) {
         int count = counts.get(n);
         while (count-- > 0)
           arr1[i++] = n;
@@ -109,8 +109,9 @@ public interface RelativeSortArray {
       }
       final int sortIdx = i;
       // 3.merge arr1
-      for (Map.Entry<Integer, Integer> e : counts.entrySet()) {
-        int count = e.getValue(), val = e.getKey();
+      for (final Map.Entry<Integer, Integer> e : counts.entrySet()) {
+        int count = e.getValue();
+		final int val = e.getKey();
         while (count-- > 0)
           arr1[i++] = val;
       }
@@ -122,7 +123,7 @@ public interface RelativeSortArray {
 
   @Author("0")
   @Submission(memory = 36.1, memoryBeatRate = 100, runtime = 0, runtimeBeatRate = 100, submittedDate = @DateTime("20191018"), url = "https://leetcode.com/submissions/detail/270857630/")
-  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N), spaceComplexity = ComplexityEnum.O_1, inplace = true)
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N), spaceComplexity = ComplexityEnum.O_1, inplace = false)
   public static class SolutionByCounting implements RelativeSortArray {
 
     /**
@@ -137,14 +138,14 @@ public interface RelativeSortArray {
      * </pre>
      */
     @Override
-    public int[] relativeSortArray(int[] arr1, int[] arr2) {
+    public int[] relativeSortArray(final int[] arr1, final int[] arr2) {
       // 1. counts[1001]
       final int[] counts = new int[1001];
-      for (int n : arr1)
+      for (final int n : arr1)
         counts[n]++;
       int i = 0;
       // 2. sorting
-      for (int n : arr2)
+      for (final int n : arr2)
         while (counts[n]-- > 0)
           arr1[i++] = n;
       // 3. merge
