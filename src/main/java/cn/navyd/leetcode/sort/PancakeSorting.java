@@ -2,12 +2,14 @@ package cn.navyd.leetcode.sort;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.navyd.annotation.algorithm.ComplexityEnum;
+import cn.navyd.annotation.algorithm.SortAlgorithm;
+import cn.navyd.annotation.algorithm.TimeComplexity;
 import cn.navyd.annotation.leetcode.Author;
+import cn.navyd.annotation.leetcode.DateTime;
+import cn.navyd.annotation.leetcode.DifficultyEnum;
 import cn.navyd.annotation.leetcode.Problem;
-import cn.navyd.annotation.leetcode.Problem.Difficulty;
-import cn.navyd.annotation.leetcode.Problem.Tag;
-import cn.navyd.annotation.leetcode.Solution;
-import cn.navyd.annotation.leetcode.Solution.Complexity;
 import cn.navyd.annotation.leetcode.Submission;
 
 /**
@@ -47,23 +49,21 @@ A[i] is a permutation of [1, 2, ..., A.length]
  * @author navyd
  *
  */
-@Problem(number = 969, difficulty = Difficulty.MEDIUM, tags = Tag.SORT, url = "https://leetcode.com/problems/pancake-sorting/")
+@Problem(number = 969, difficulty = DifficultyEnum.MEDIUM)
 public interface PancakeSorting {
   /**
    * 对数组A使用煎饼排序。返回翻转元素的下标+1集合
+   * <p>思路：两次翻转最大的到最后面
    * @param A
    * @return
    */
   public List<Integer> pancakeSort(int[] A);
   
   // 解释煎饼排序
-  @Author(name = "CMU",
-      referenceUrls = "http://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15251-f06/Site/Materials/Lectures/Lecture01/lecture01.pdf")
-  @Author(name = "wangzi6147", significant = true,
-      referenceUrls = "https://leetcode.com/problems/pancake-sorting/discuss/214200/Java-flip-the-largest-number-to-the-tail")
-  @Submission(date = "2019-06-01", memory = 35.4, memoryBeatRate = 97.60, runtime = 1,
-      runtimeBeatRate = 100.00, url = "https://leetcode.com/submissions/detail/232792533/")
-  @Solution(spaceComplexity = Complexity.O_N_POW_2, timeComplexity = Complexity.O_N_POW_2)
+  @Author(value = "CMU", references = "http://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15251-f06/Site/Materials/Lectures/Lecture01/lecture01.pdf")
+  @Author(value = "wangzi6147", references = "https://leetcode.com/problems/pancake-sorting/discuss/214200/Java-flip-the-largest-number-to-the-tail")
+  @Submission(memory = 35.4, memoryBeatRate = 97.60, runtime = 1, runtimeBeatRate = 100.00, url = "https://leetcode.com/submissions/detail/232792533/", submittedDate = @DateTime("20190601"))
+  @SortAlgorithm(timeComplexity = @TimeComplexity(worst = ComplexityEnum.O_N_POW_2), spaceComplexity = ComplexityEnum.O_N, inplace = false)
   public static class SolutionByBringToTop implements PancakeSorting {
     
     /**
@@ -81,6 +81,7 @@ public interface PancakeSorting {
     public List<Integer> pancakeSort(int[] A) {
       final int n = A.length;
       final List<Integer> answer = new ArrayList<>(2*n);
+      // A[i] is a permutation of [1, 2, ..., A.length]
       int largest = n;
       while (largest > 0) {
         int largestIndex = indexOf(A, largest);
@@ -112,6 +113,58 @@ public interface PancakeSorting {
      * @param a
      * @param index
      */
+    static void flip(int[] a, int index) {
+      for (int i = 0, j = index; i < j; i++, j--) {
+        int temp = a[i];
+        a[i] = a[j];
+        a[j] = temp;
+      }
+    }
+  }
+
+  @Author(value = "大力王", references = "https://leetcode-cn.com/problems/pancake-sorting/solution/c-jian-dan-shu-xue-fa-by-da-li-wang/")
+  @Author("navyd")
+  @Submission(memory = 36.7, memoryBeatRate = 94.74, runtime = 1, runtimeBeatRate = 100, submittedDate = @DateTime("20191210"), url = "https://leetcode.com/submissions/detail/284892386/")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N_POW_2), spaceComplexity = ComplexityEnum.O_N, inplace = true)
+  public static class SolutionByFlipToButtom implements PancakeSorting {
+    /**
+     * 思路：与{@link PancakeSorting.SolutionByBringToTop#pancakeSort(int[])}一致，不同的是flip直接的下标，
+     * 而不是特殊largest与A的关系，更直接可读
+     * <p>优化
+     * <ul>
+     * <li>当maxIdx已在最后时，不需要两次flip。对于有序数组有用
+     * <li>当maxIdx==0时，不需要flip to top
+     * <li>利用input A的特殊性A[i++]=i可减少find max idx的时间：i+1(max) == A[j]; break;
+     * </ul>
+     * <p>复杂度
+     * <li>时间：O(N^2)
+     * <li>空间：O(N)
+     */
+    @Override
+    public List<Integer> pancakeSort(int[] A) {
+      final List<Integer> res = new ArrayList<>(2*A.length);
+      // 0. repeat until buttom=1|0 
+      for (int i = A.length - 1; i > 0; i--) {
+        // 1. find max value indx
+        int maxIdx = 0;
+        for (int j = 1; j <= i; j++) 
+          if (A[maxIdx] < A[j])
+            maxIdx = j;
+        // has been in the last 
+        if (maxIdx == i)
+          continue;
+        // 2. flip to top
+        if (maxIdx > 0) {
+          flip(A, maxIdx);
+          res.add(maxIdx+1);
+        }
+        // 3. flip to buttom
+        flip(A, i);
+        res.add(i+1);
+      }
+      return res;
+    }
+
     static void flip(int[] a, int index) {
       for (int i = 0, j = index; i < j; i++, j--) {
         int temp = a[i];
