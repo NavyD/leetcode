@@ -1,12 +1,22 @@
 package cn.navyd.leetcode.sort;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.Comparator;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Random;
+
+import cn.navyd.annotation.algorithm.ComplexityEnum;
+import cn.navyd.annotation.algorithm.SortAlgorithm;
+import cn.navyd.annotation.algorithm.TimeComplexity;
+import cn.navyd.annotation.leetcode.Author;
+import cn.navyd.annotation.leetcode.DateTime;
+import cn.navyd.annotation.leetcode.DifficultyEnum;
+import cn.navyd.annotation.leetcode.Problem;
+import cn.navyd.annotation.leetcode.Submission;
 
 /**
+ * <pre>
 We have a list of points on the plane.  Find the K closest points to the origin (0, 0).
 
 (Here, the distance between two points on a plane is the Euclidean distance.)
@@ -36,140 +46,254 @@ Note:
 1 <= K <= points.length <= 10000
 -10000 < points[i][0] < 10000
 -10000 < points[i][1] < 10000
+ * </pre>
  * @author navyd
  *
  */
-public class KClosestPointstoOrigin {
-  
+@Problem(difficulty = DifficultyEnum.MEDIUM, number = 973)
+public interface KClosestPointstoOrigin {
+
   /**
-   * 思路：遍历计算每个point的距离distance，并将distance作为key，points作为value保存到SortedMap中，最后遍历k个最小距离的元素即可
+   * 找k个最小的point
+   * <p>思路
+   * <ul>
+   * <li>full sort
+   * <li>half sort for bubble, selection
+   * <li>priority queue
+   * <li>quick select
+   * </ul>
    * @param points
    * @param K
    * @return
    */
-  public int[][] kClosest(int[][] points, int K) {
-    // original 0,0
-    // |AB| = √[(x₁-x₂)²+(y₁-y₂)²]
-    Map<Double, List<int[]>> map = new TreeMap<>();
-    // 计算距离
-    for (int i = 0; i < points.length; i++) {
-      int[] point = points[i];
-      double powVal = Math.pow(point[0], 2) + Math.pow(point[1], 2);
-      double distance = Math.sqrt(powVal);
-      if (!map.containsKey(distance)) {
-        map.put(distance, new ArrayList<>());
-      }
-      List<int[]> indexs = map.get(distance);
-      indexs.add(point);
-    }
-    int[][] r = new int[K][];
-    int i = 0;
-    out: for (Map.Entry<Double, List<int[]>> entry : map.entrySet()) {
-      List<int[]> indexs = entry.getValue();
-      for (int[] point : indexs) {
-        r[i++] = point;
-        if (i >= K)
-          break out;
-      }
-      
-    }
-    return r;
-  }
-  
-  static class Solution {
+  public int[][] kClosest(int[][] points, int K);
+
+  @Author(value = "Frimish", references = "https://leetcode.com/problems/k-closest-points-to-origin/discuss/220235/Java-Three-solutions-to-this-classical-K-th-problem.")
+  @Author("navyd")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N_LOG_N), spaceComplexity = ComplexityEnum.O_N, stability = true)
+  @Submission(memory = 59.1, memoryBeatRate = 76.40, runtime = 24, runtimeBeatRate = 62.29, submittedDate = @DateTime("20191210"), url = "https://leetcode.com/submissions/detail/284941961/")
+  public static class SolutionBySort implements KClosestPointstoOrigin {
+    /**
+     * 思路：对points完整排序，找K个元素
+     */
+    @Override
     public int[][] kClosest(int[][] points, int K) {
-      return kClosestByDivideAndConquer(points, K);
-    }
-    /**
-     * 思路：通过将距离排序获取k范围内的最大距离maxDist，然后遍历获取<=maxDist的point
-     * 时间复杂度：O(N log N)主要在排序中。未保存distances对应的points下标，而是使用遍历的方式重新计算获取，减少空间复杂度
-     * 空间复杂度：O(N)
-     * @param points
-     * @param K
-     * @return
-     */
-    public int[][] kClosestBySort(int[][] points, int K) {
-      // 获取distance数组
-      int len = points.length;
-      int[] distances = new int[len];
-      for (int i = 0; i < len; i++)
-        distances[i] = distance(points[i]);
-      // 排序
-      Arrays.sort(distances);
-      // 获取distance[k-1]最大的距离
-      int maxDistance = distances[K-1];
-      // 遍历points比较距离，<=最大的添加
-      int[][] r = new int[K][2];
-      int i = 0;
-      for (int[] point : points) {
-        if (distance(point) <= maxDistance)
-          r[i++] = point;
-      }
-      return r;
-    }
-    
-    private int distance(int[] point) {
-      return point[0] * point[0] + point[1] * point[1];
-    }
-    
-    // Divide and Conquer
-    /**
-     * 思路：基于快速排序的quick select。不需要对所有元素排序，只需要选择指定的范围即可
-     * 每个数组元素使得在切分点pivot左边元素都<=pivot，右边都>pivot，然后返回的切分点下标mid，
-     * 如果[0-mid]的元素数量q<K，元素较少则继续切分[mid+1,hi]。
-     * 如果q>K，元素过多继续切分[lo, mid-1]。
-     * 如果q==K则刚好满足停止。
-     * 时间复杂度：与快排类似，平均为O(N)，最坏为N^2/2
-     * 空间复杂度：O(N)
-     * @param points
-     * @param K
-     * @return
-     */
-    public int[][] kClosestByDivideAndConquer(int[][] points, int K) {
-      sort(points, 0, points.length-1, K);
+      // 0. create comparator
+      final Comparator<int[]> cmp = (a, b) -> (a[0]*a[0]+a[1]*a[1]) - (b[0]*b[0]+b[1]*b[1]);
+      // 1. sort
+      Arrays.sort(points, cmp);
+      // 2. select k
       return Arrays.copyOf(points, K);
     }
-    
-    private void sort(int[][] points, int lo, int hi, int K) {
-      // K 表示选择多少个元素
-      K -=1;
-      // 切分元素直到满足K个元素
-      while (lo <= hi) {
-        int mid = partition(points, lo, hi);
-        if (mid == K)
+  }
+
+  @Author("navyd")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(best = ComplexityEnum.O_N_K, worst = ComplexityEnum.O_N_POW_2), spaceComplexity = ComplexityEnum.O_K, inplace = true)
+  @Submission(memory = 60.5, memoryBeatRate = 60.87, runtime = 657, runtimeBeatRate = 5.09, submittedDate = @DateTime("20191210"), url = "https://leetcode.com/submissions/detail/284946428/")
+  public static class SolutionByHalfSort implements KClosestPointstoOrigin {
+    /**
+     * 思路：对points使用half selection，当k个元素有序时就可以不用排序
+     * <p>时间复杂度：最差是K=N即O(N*N)
+     * <p>空间复杂度：归并排序使用空间O(N)
+     * 
+     */
+    @Override
+    public int[][] kClosest(int[][] points, int K) {
+      // 0. create comparator
+      final Comparator<int[]> cmp = (a, b) -> (a[0]*a[0]+a[1]*a[1]) - (b[0]*b[0]+b[1]*b[1]);
+      // 1. selection for k
+      for (int i = 0; i < points.length; i++) {
+        int minIdx = i;
+        for (int j = minIdx+1; j < points.length; j++) {
+          if (cmp.compare(points[minIdx], points[j]) > 0)
+            minIdx = j;
+        }
+        swap(points, i, minIdx);
+        // 2. at least k has sorted
+        if (i >= K-1)
           break;
-        else if (mid < K)
-          lo = mid + 1;
-        else if (mid > K)
-          hi = mid-1;
       }
+      return Arrays.copyOf(points, K);
     }
-    
-    private int partition(int[][] points, int lo, int hi) {
-      int pivot = distance(points[lo]);
-      int i = lo, j = hi+1;
-      while (true) {
-        while (distance(points[++i]) <= pivot && i < hi);
-        while (distance(points[--j]) > pivot);
-        if (i >= j)
-          break;
-        swap(points, i, j);
-      }
-      swap(points, lo, j);
-      return j;
-    }
-    
-    private void swap(int[][] a, int i, int j) {
-      int[] tmp = a[i];
+
+    static void swap(Object[] a, int i, int j) {
+      Object temp = a[i];
       a[i] = a[j];
-      a[j] = tmp;
+      a[j] = temp;
     }
   }
-  
+
+  @Author(value = "Frimish", references = "https://leetcode.com/problems/k-closest-points-to-origin/discuss/220235/Java-Three-solutions-to-this-classical-K-th-problem.")
+  @Submission(memory = 62.6, memoryBeatRate = 40.37, runtime = 23, runtimeBeatRate = 65.35, submittedDate = @DateTime("20191211"), url = "https://leetcode.com/submissions/detail/285124273/")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N_LOG_K), spaceComplexity = ComplexityEnum.O_K)
+  public static class SolutionByPriorityQueue implements KClosestPointstoOrigin {
+    /**
+     * 思路：使用max priority queue保存K个最小的元素。
+     * 为何需要max priority在删除queue元素时只有poll head操作，min priority poll就删了最小的元素，不可行。
+     * 如果是max priority poll时删的是第K+1个最大的元素，保存了K个最小元素
+     * <p>时间复杂度：points对queue.offer为O(N log K)，遍历queue是O(K)
+     * <p>空间复杂度：queue是O(K)
+     */
+    @Override
+    public int[][] kClosest(int[][] points, int K) {
+      // 0. create max priority queue
+      final Comparator<int[]> cmp = (a, b) -> (b[0]*b[0]+b[1]*b[1]) - (a[0]*a[0]+a[1]*a[1]);
+      final Queue<int[]> queue = new PriorityQueue<>(K, cmp);
+      // 1. offer k elements for all points
+      for (int[] p : points) {
+        queue.offer(p);
+        // 2. poll k+1 elelment
+        if (queue.size() > K)
+          queue.poll();
+      }
+      int[][] res = new int[K][2];
+      int i = 0;
+      // 使用poll会增加多余的操作时间
+      for (int[] p : queue)
+        res[i++] = p;
+      return res;
+    }
+  }
+
+  @Author(value = "Frimish", references = "https://leetcode.com/problems/k-closest-points-to-origin/discuss/220235/Java-Three-solutions-to-this-classical-K-th-problem.")
+  @Author("navyd")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N, best = ComplexityEnum.O_N, worst = ComplexityEnum.O_N_K), spaceComplexity = ComplexityEnum.O_K)
+  @Submission(memory = 57.8, memoryBeatRate = 85.09, runtime = 4, runtimeBeatRate = 99.68, submittedDate = @DateTime("20191223"), url = "https://leetcode.com/submissions/detail/287854522/")
+  public static class SolutionByQuickSelect implements KClosestPointstoOrigin {
+    
+    /**
+     * 思路：quick select切分出第K个元素。不需要排序
+     * <p>问题：
+     * <ul>
+     * <li>存在的相等元素时，如何解决找K个：什么时候有lo>hi.
+     * <p>不需要这个条件，由于return mid切分的是在lo,hi中，
+     * +1-1逼进[0]
+     * <li>partition的位置与K的关系{@code >K <K =K}怎么解决：
+     * <p> =k时刚好有K个元素满足。
+     * <p> {@code >k}时说明mid左边元素更多，取小元素[lo,mid-1]partition。
+     * <p> {@code <k}时mid左边元素少，取更大的元素[mid+1,hi]partition
+     * <li>怎样在partition中使用非lo的pivot，如何处理pivot的swap,return。为何不能在partition中使用lo,hi指针
+     * <p>partition中直接使用random的pivot值会可能导致pivot被swap丢失pivot的位置，return hi的下标不再表示 <= hi >关系，
+     * 仅能表示的hi位置长度是小于原来pivot信息丢失
+     * <p>由于pivot>lo时导致while中pivot被swap,必须记录pivot，否则将会少一次swap丢失pivot信息
+     * </ul>
+     * <p>时间复杂度：最差是pivot=max|min，每次partition返回的是最min|max index，这样只能每次+-1逼进到K次，即O(K N)
+     * <p>空间复杂度：返回结果给copy array即O(N)
+     */
+    @Override
+    public int[][] kClosest(int[][] points, int K) {
+      K -= 1;
+      int lo = 0, hi = points.length-1;
+      while (true) {
+        // 0. get position of partition between lo, hi
+        int mid = partition(points, lo, hi);
+        // 1. position elements less than K
+        if (mid < K)
+          lo = mid + 1;
+        // 2. elements more than K
+        else if (mid > K)
+          hi = mid - 1;
+        // 3. K elements
+        else 
+          return Arrays.copyOf(points, K+1);
+      }
+    }
+
+    static final Random RAND = new Random();
+
+    static int partition(int[][] points, int lo, int hi) {
+      // random pivot
+      swap(points, lo, RAND.nextInt(hi-lo+1)+lo);
+      final int 
+        pivot = lo,
+        pivotDist = distance(points, pivot);
+      hi++;
+      while (true) {
+        while (distance(points, --hi) > pivotDist);
+        while (lo < hi && distance(points, ++lo) < pivotDist);
+        if (lo >= hi) break;
+        swap(points, lo, hi);
+      }
+      swap(points, pivot, hi);
+      return hi;
+    }
+
+    static void swap(Object[] a, int i, int j) {
+      Object temp = a[i];
+      a[i] = a[j];
+      a[j] = temp;
+    }
+
+    static int compare(int[] a, int[] b) {
+      return (a[0]*a[0]+a[1]*a[1]) - (b[0]*b[0]+b[1]*b[1]);
+    }
+
+    static int distance(int[][] points, int i) {
+      return points[i][0] * points[i][0] + points[i][1] * points[i][1];
+    }
+
+  }
+
+  @Author("navyd")
+  @Submission(memory = 60.9, memoryBeatRate = 51.55, runtime = 5, runtimeBeatRate = 92.42, submittedDate = @DateTime("20191227"), url = "https://leetcode.com/submissions/detail/288875001/")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N, best = ComplexityEnum.O_N, worst = ComplexityEnum.O_N_K), spaceComplexity = ComplexityEnum.O_K, stability = false, inplace = false)
+  public static class SolutionBySimpleQuickSelect implements KClosestPointstoOrigin {
+    /**
+     * 一个简单的quick select版本。
+     */
+    @Override
+    public int[][] kClosest(int[][] points, int K) {
+      K -= 1;
+      int lo = 0, hi = points.length - 1; 
+      while (true) {
+        // 0. partition
+        int mid = partition(points, lo, hi);
+        // 1. check partition position and K 
+        if (mid < K)
+          lo = mid + 1;
+        else if (mid > K)
+          hi = mid - 1;
+        else  
+          break;
+      }
+      // 2. return array of k
+      return Arrays.copyOf(points, K+1);
+    }
+
+    static int partition(int[][] points, int lo, int hi) {
+      int pivot = lo;
+      while (lo <= hi) {
+        if (compare(points[pivot], points[lo]) < 0)
+          swap(points, lo, hi--);
+        else lo++;
+      }
+      swap(points, pivot, hi);
+      return hi;
+    }
+
+    static void swap(Object[] a, int i, int j) {
+      Object temp = a[i];
+      a[i] = a[j];
+      a[j] = temp;
+    }
+
+    static int compare(int[] a, int[] b) {
+      return (a[0]*a[0]+a[1]*a[1]) - (b[0]*b[0]+b[1]*b[1]);
+    }
+
+    static int distance(int[][] points, int i) {
+      return points[i][0] * points[i][0] + points[i][1] * points[i][1];
+    }
+  }
+
   public static void main(String[] args) {
-    Solution s = new Solution();
-//    int[][] a = {{1,3},{-2,2}};
-    int[][] a = {{-2,10},{-4,-8},{10,7},{-4,-7}};
-    System.err.println(Arrays.deepToString(s.kClosest(a, 3)));;
+    KClosestPointstoOrigin p = new SolutionByQuickSelect();
+    // int[][] a = {{3,3},{5,-1},{-2,4}};
+    int count = 100;
+    while (count-- > 0) {
+      int[][] a = { { -2, 10 }, { -4, -8 }, { 10, 7 }, { -4, -7 } };
+      // int[][] a = {{1,3},{-2,2}};
+      System.err.println(Arrays.deepToString(p.kClosest(a, 3)));
+    }
   }
 }
