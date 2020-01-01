@@ -1,14 +1,13 @@
 package cn.navyd.leetcode.sort;
 
+import cn.navyd.annotation.algorithm.ComplexityEnum;
+import cn.navyd.annotation.algorithm.SortAlgorithm;
+import cn.navyd.annotation.algorithm.TimeComplexity;
 import cn.navyd.annotation.leetcode.Author;
-import cn.navyd.annotation.leetcode.Optimal;
+import cn.navyd.annotation.leetcode.DateTime;
+import cn.navyd.annotation.leetcode.DifficultyEnum;
 import cn.navyd.annotation.leetcode.Problem;
-import cn.navyd.annotation.leetcode.Problem.Difficulty;
-import cn.navyd.annotation.leetcode.Problem.Tag;
-import cn.navyd.annotation.leetcode.Solution;
-import cn.navyd.annotation.leetcode.Solution.Complexity;
 import cn.navyd.annotation.leetcode.Submission;
-import cn.navyd.annotation.leetcode.Unskilled;
 
 /**
 Given an array with n objects colored red, white or blue, sort them in-place so that objects of the same color are adjacent, with the colors in the order red, white and blue.
@@ -30,7 +29,7 @@ Could you come up with a one-pass algorithm using only constant space?
  * @author navyd
  *
  */
-@Problem(number = 75, difficulty = Difficulty.MEDIUM, tags = Tag.SORT, url = "https://leetcode.com/problems/sort-colors/")
+@Problem(number = 75, difficulty = DifficultyEnum.MEDIUM)
 public interface SortColors {
   /**
    * 将nums的三种元素0,1,2排序。不能使用类库
@@ -39,14 +38,10 @@ public interface SortColors {
   public void sortColors(int[] nums);
 
   // two-pass
-  @Unskilled
-  @Submission(date = "2019-05-19", 
-      runtime = 0, runtimeBeatRate = 100.00, memory = 34.3, memoryBeatRate = 100.00,
-      url = "https://leetcode.com/submissions/detail/229812204/")
-  @Submission(date = "2019-03-16", 
-    runtime = 0, runtimeBeatRate = 100.00, memory = 34.8, memoryBeatRate = 95.61,
-    url = "https://leetcode.com/submissions/detail/215028926/")
-  @Solution(timeComplexity = Complexity.O_N, spaceComplexity = Complexity.O_1, tags = Tag.SORT_COUNTING)
+  @Author("navyd")
+  @Submission(submittedDate = @DateTime("20190519"), runtime = 0, runtimeBeatRate = 100.00, memory = 34.3, memoryBeatRate = 100.00, url = "https://leetcode.com/submissions/detail/229812204/")
+  @Submission(submittedDate = @DateTime("20190316"), runtime = 0, runtimeBeatRate = 100.00, memory = 34.8, memoryBeatRate = 95.61, url = "https://leetcode.com/submissions/detail/215028926/")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N), spaceComplexity = ComplexityEnum.O_1)
   public static class SolutionByCounting implements SortColors {
 
     /**
@@ -67,43 +62,39 @@ public interface SortColors {
       }
     }
   }
-  
+
   // 最符合题意：one-pass
-  @Optimal
-  @Author(name = "navyd")
-  @Submission(date = "2019-05-19", 
-      runtime = 0, runtimeBeatRate = 100.00, memory = 34.2, memoryBeatRate = 100.00,
-      url = "https://leetcode.com/submissions/detail/229819292/")
-  @Solution(tags = Tag.SORT_QUICK_SELECT, timeComplexity = Complexity.O_N, spaceComplexity = Complexity.O_1)
+  @Author("navyd")
+  @Submission(submittedDate = @DateTime("20190519"), runtime = 0, runtimeBeatRate = 100.00, memory = 34.2, memoryBeatRate = 100.00, url = "https://leetcode.com/submissions/detail/229819292/")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N), spaceComplexity = ComplexityEnum.O_1)
+  @Submission(submittedDate = @DateTime("20200101"), runtime = 0, runtimeBeatRate = 100.00, memory = 34.8, memoryBeatRate = 100.00, url = "https://leetcode.com/submissions/detail/290183906/")
   public static class SolutionByPartition implements SortColors {
 
     /**
      * 思路：nums仅存在三种元素，是大量重复元素类型，partition-3-way是quick select的最适合的情况
-     * <p>使用pivot=1将数组元素分开
+     * <p>
+     * 使用pivot=1将数组元素分开
      */
     @Override
     public void sortColors(int[] nums) {
-      partition(nums, 0, nums.length - 1);
-    }
-
-    static void partition(int[] nums, int lo, int hi) {
+      int lo = 0, hi = nums.length - 1, i = lo;
       final int pivot = 1;
-      for (int i = 0; i <= hi;) {
-        int num = nums[i];
-        if (num < pivot)
-          swap(nums, i++, lo++);
-        else if (num > pivot)
-          swap(nums, i, hi--);
+      // 1. 3way quick select with 1
+      while (i <= hi) {
+        int diff = nums[i] - pivot;
+        if (diff < 0)
+          swap(nums, lo++, i++);
+        else if (diff > 0)
+          swap(nums, hi--, i);
         else
           i++;
       }
     }
 
     static void swap(int[] nums, int i, int j) {
-      int tmp = nums[i];
+      int temp = nums[i];
       nums[i] = nums[j];
-      nums[j] = tmp;
+      nums[j] = temp;
     }
-
   }
 }
