@@ -35,7 +35,11 @@ NOTE: input types have been changed on April 15, 2019. Please reset to default c
 @Problem(number = 56, difficulty = DifficultyEnum.MEDIUM)
 public interface MergeIntervals {
   /**
-   * 合并重叠的区间
+   * 合并重叠的区间，直接合并可能导致某些之前的区间被合并后新区间重叠但是跳过。有两种方式：
+   * <ul>
+   * <li>sort：保证interval.start有序出现
+   * <li>merge to end：合并的区间移动到最后而不是前面不动，避免了跳过的问题
+   * </ul>
    * @param intervals
    * @return
    */
