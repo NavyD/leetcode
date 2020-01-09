@@ -3,20 +3,35 @@ package cn.navyd.leetcode.sort;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
-import cn.navyd.annotation.leetcode.Author;
-import cn.navyd.annotation.leetcode.Optimal;
-import cn.navyd.annotation.leetcode.Problem;
-import cn.navyd.annotation.leetcode.Problem.Difficulty;
-import cn.navyd.annotation.leetcode.Problem.Tag;
-import cn.navyd.annotation.leetcode.Skilled;
-import cn.navyd.annotation.leetcode.Solution;
-import cn.navyd.annotation.leetcode.Solution.Complexity;
-import cn.navyd.annotation.leetcode.Submission;
-import cn.navyd.annotation.leetcode.Submission.Status;
-import cn.navyd.annotation.leetcode.Unskilled;
 
-@Unskilled
-@Problem(number = 220, tags = Tag.SORT, difficulty = Difficulty.MEDIUM, url = "https://leetcode.com/problems/contains-duplicate-iii/")
+import cn.navyd.annotation.algorithm.ComplexityEnum;
+import cn.navyd.annotation.algorithm.SortAlgorithm;
+import cn.navyd.annotation.algorithm.TimeComplexity;
+import cn.navyd.annotation.leetcode.Author;
+import cn.navyd.annotation.leetcode.DateTime;
+import cn.navyd.annotation.leetcode.DifficultyEnum;
+import cn.navyd.annotation.leetcode.Problem;
+import cn.navyd.annotation.leetcode.Submission;
+
+/**
+ * <pre>
+Given an array of integers, find out whether there are two distinct indices i and j in the array such that the absolute difference between nums[i] and nums[j] is at most t and the absolute difference between i and j is at most k.
+
+Example 1:
+
+Input: nums = [1,2,3,1], k = 3, t = 0
+Output: true
+Example 2:
+
+Input: nums = [1,0,1,1], k = 1, t = 2
+Output: true
+Example 3:
+
+Input: nums = [1,5,9,1,5,9], k = 2, t = 3
+Output: false
+</pre>
+ */
+@Problem(number = 220, difficulty = DifficultyEnum.MEDIUM)
 public interface ContainsDuplicateIII {
   /**
    * 要求nums两个下标i,j的绝对值在k范围内对应的nums[i], nums[j]的绝对值在t范围内
@@ -28,12 +43,100 @@ public interface ContainsDuplicateIII {
    */
   public boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t);
 
-  @Skilled
-  @Author(name = "navyd", significant = true)
-  @Submission(runtime = 405, runtimeBeatRate = 11.46, memory = 37.2, memoryBeatRate = 71.16,
-      date = "2019-05-12", 
-      url = "https://leetcode.com/submissions/detail/228294328/")
-  @Solution(timeComplexity = Complexity.O_N_K, spaceComplexity = Complexity.O_1)
+  @Author(value = "力扣 (LeetCode)", references = "https://leetcode-cn.com/problems/contains-duplicate-iii/solution/cun-zai-zhong-fu-yuan-su-iii-by-leetcode/")
+  @Submission(memory = 37.6, memoryBeatRate = 86.36, runtime = 9, runtimeBeatRate = 91.85, submittedDate = @DateTime("20200105"), url = "https://leetcode.com/submissions/detail/291238159/")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N), spaceComplexity = ComplexityEnum.O_K)
+  public static class SolutionByBucket implements ContainsDuplicateIII {
+    /**
+     * <p>思路：在k window中找是否有元素差值<=t。把元素分为[-t-1,-1][0,t],[t+1,2t+1]...
+     * <p>问题
+     * <ul>
+     * <li>为何要检查bucket prev, next两个相邻位置，为何能快速的检查prev,next
+     * <p>由于bucket窗口内的元素必定是在<=t的，即bucket仅一个值put一次。相邻的元素差值1<=diff<=2t+1，k窗口中只出现一次bucket（两次则diff<=t），
+     * 不需要考虑bucket多个值的问题。bucket间仅检查两个元素
+     * <li>bucket=num/t+1与num/t有无区别：有区别
+     * <p>如果t=3最大差值为3，一个bucket= 0 <=> [0,3]刚好，3/3=1不在bucket=0这个桶，而3/(3+1)刚好
+     * <p>另外，t=0是可能的，3/0将不可行的，num/t+1刚好避开了这个问题
+     * <li>有没有可能同一个bucket由于put覆盖接近的元素被移除导致get-num>t：不可能。同一个bucket表示满足<=t直接返回
+     * <li>为何使用{@code Map<Long, Long>}：由于nums[i], t都会进行运算可能会int溢出
+     * <li>为何num<0时{@code bucket= (num + 1) / range - 1}：由于[0,t]/(t+1)占了0的位置，[-t-1, -1]只有能占-1的位置。
+     * 当t=3，[-4,-1]要使bucket=-1，-4/4=-1, -3/4=0，==> (num+1)/range - 1 => (-4+1) / 4 - 1 = -1
+     * </ul>
+     */
+    @Override
+    public boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
+      if (k <= 0 || t < 0)
+        return false;
+      // 0. create hash map for k window
+      final Map<Long, Long> buckets = new HashMap<>(k);
+      // be careful of int overflow
+      final long range = t + 1L;
+      for (int i = 0; i < nums.length; i++) {
+        // 1. get bucket with num and t
+        final long bucket = getBucket(nums[i], range);
+        // 3. check bucket existed or adjacent bucket
+        if (buckets.containsKey(bucket))
+          return true;
+        if (buckets.containsKey(bucket - 1) && Math.abs(nums[i] - buckets.get(bucket - 1)) <= t)
+          return true;
+        if (buckets.containsKey(bucket + 1) && Math.abs(buckets.get(bucket + 1) - nums[i]) <= t)
+          return true;
+        // 2. put bucket
+        buckets.put(bucket, (long)nums[i]);
+        // remove last bucket if window > k
+        if (buckets.size() > k)
+          buckets.remove(getBucket(nums[i-k], range));
+      }
+      return false;
+    }
+
+    static long getBucket(long num, long range) {
+      return num >= 0 ? num / range : (num + 1) / range - 1;
+    }
+  }
+
+  @Author(value = "力扣 (LeetCode)", references = "https://leetcode-cn.com/problems/contains-duplicate-iii/solution/cun-zai-zhong-fu-yuan-su-iii-by-leetcode/")
+  @Author(value = "user8982", references = "https://leetcode.com/problems/contains-duplicate-iii/discuss/61655/Java-O(N-lg-K)-solution/144810")
+  @Author(value = "jmnarloch", references = "https://leetcode.com/problems/contains-duplicate-iii/discuss/61655/Java-O(N-lg-K)-solution")
+  @Submission(runtime = 27, runtimeBeatRate = 30.72, memory = 36.3, memoryBeatRate = 82.33, submittedDate = @DateTime("20190514"), url = "https://leetcode.com/submissions/detail/228760292/")
+  @Submission(runtime = 21, runtimeBeatRate = 55.9, memory = 36.2, memoryBeatRate = 97.73, submittedDate = @DateTime("20200108"), url = "https://leetcode.com/submissions/detail/228760292/")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N_LOG_K), spaceComplexity = ComplexityEnum.O_K)
+  public static class SolutionByBST implements ContainsDuplicateIII {
+    /**
+     * 思路：在k window中使用Binary Search Tree检查是否存在与当前值差为t
+     * <p>问题
+     * <ul>
+     * <li>为何floor/ceiling num一个就够了：要求是将nums有没有差值在t值内，而不是所有值在t内
+     * </ul>
+     */
+    @Override
+    public boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
+      if (k < 1 || t < 0 || nums.length == 0)
+        return false;
+      // 1. create bst
+      final java.util.NavigableSet<Long> set = new TreeSet<>();
+      for (int i = 0; i < nums.length; i++) {
+        final long num = nums[i];
+        final Long floorNum = set.floor(num);
+        // 2. check equal or floor num and t difference
+        if (floorNum != null && num - floorNum <= t)
+          return true;
+        final Long ceilingNum = set.ceiling(num);
+        // 3. check equal ceiling num and t difference
+        if (ceilingNum != null && ceilingNum - num <= t)
+          return true;
+        set.add(num);
+        // 4. window elements is k+1, set must is k size
+        if (set.size() > k)
+          set.remove((long)nums[i-k]);
+      }
+      return false;
+    }
+  }
+
+  @Author("navyd")
+  @Submission(runtime = 405, runtimeBeatRate = 11.46, memory = 37.2, memoryBeatRate = 71.16, submittedDate = @DateTime("20190512"), url = "https://leetcode.com/submissions/detail/228294328/")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N_POW_2), spaceComplexity = ComplexityEnum.O_1)
   public static class SolutionByIteration implements ContainsDuplicateIII {
 
     /**
@@ -55,110 +158,51 @@ public interface ContainsDuplicateIII {
       return false;
     }
   }
-  
-  @Optimal
-  @Author(name = "jmnarloch", referenceUrls = "https://leetcode.com/problems/contains-duplicate-iii/discuss/61655/Java-O(N-lg-K)-solution")
-  @Author(name = "wzrthhj", significant = true, 
-      referenceUrls = "https://leetcode.com/problems/contains-duplicate-iii/discuss/61645/AC-O(N)-solution-in-Java-using-buckets-with-explanation/62992")
-  @Author(name = "lx223", significant = true, 
-  referenceUrls = "https://leetcode.com/problems/contains-duplicate-iii/discuss/61645/AC-O(N)-solution-in-Java-using-buckets-with-explanation")
-  @Submission(date = "2019-05-13", status = Status.ACCEPTED,
-      runtime = 8, runtimeBeatRate = 95.30, memory = 36.9, memoryBeatRate = 72.56,
-      url = "https://leetcode.com/submissions/detail/228570208/")
-  @Solution(tags = Tag.SORT_BUCKET, timeComplexity = Complexity.O_N, spaceComplexity = Complexity.O_K)
-  public static class SolutionByBucketSort implements ContainsDuplicateIII {
+
+  @Author(value = "0", references = "https://leetcode.com/submissions/api/detail/220/java/0/")
+  public static class ErrorSolutionBySlidingWindow implements ContainsDuplicateIII {
     /**
-     * 对nums使用桶排序的思路解决：就是将t作为一个区分重复元素的范围值
-     * <ol>
-     * <li>桶的数量最多为k+1个，将nums值在t差值之内都分配到同一个桶中，作为重复元素处理，
-     * <li>如果同一个桶存在多个元素，表示在k范围内nums存在 <= t的两个元素
-     * <li>如果桶仅存在一个元素（由上一条保证，多个元素的桶一定不会出现），则需要考虑相邻桶的差值是否在 <=t
-     * <li>当迭代元素超过k+1个元素后，删除最前面的桶，保证k+1个桶，就像一个滑动的k+1大的window
-     * </ol>
-     * 实现：
-     * <ul>
-     * <li>由于处理负数比较麻烦（处理绝对值），直接重新映射num-Integer.MIN_VALUE不会为负数
-     * <li>由于两个数差值t可能为包含0，使用t+1分配桶，防止除0异常
-     * <li>map保存k个元素，第k+1个元素先计算桶并比较结果后才移动window移除最前的桶并添加k+1桶保证k size
-     * </ul>
-     * 时间复杂度：{@link Complexity#O_N}。
-     * 由于buckets是一个hash map，get, containsKey, remove等操作都是{@link Complexity#O_1}，迭代nums是{@link Complexity#O_N}
+     * 思路：sliding window 暴力破解
+     * <p>错误答案：官方所有用例可以通过，但下面的测试无法通过。
+     * <p>原因：当t==0时end=end的做法将跳过start-end中间元素不比较
+     * 
+     * <pre>
+[8,1,1,6,7,5,9]
+3
+0
+     * </pre>
+     * 解决方案：取消t==0做法正常比较，但是时间复杂度是O(N^2)
      */
     @Override
     public boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
-      if (k < 1 || t < 0)
+      if (k < 1 || t < 0 || nums.length <= 1)
         return false;
-      final long offset = Integer.MIN_VALUE, range = (long)t + 1;
-      Map<Long, Long> buckets = new HashMap<>(k);
-      for (int i = 0; i < nums.length; i++) {
-        final long 
-          // 重新映射num
-          remappedNum = (long)nums[i] - offset,
-          // 将num 分配bucket
-          bucket = remappedNum / range;
-        final long prev = bucket - 1, next = bucket + 1;
-        // 判断buckets是否满足<=t
-        if (buckets.containsKey(bucket) // 同一个桶存在多个元素
-            // 当前bucket与前一个桶的元素值（都是单元素桶）相差在t范围内，关于 prev < bucket 可以推出 prev num < bucket num
-            || (buckets.containsKey(prev) && remappedNum - buckets.get(prev) <= t)
-            || (buckets.containsKey(next) && buckets.get(next) - remappedNum <= t))
+      int start = 0, end = 1;
+      final int n = nums.length, endIndex = n - 1;
+      // out loop 
+      while (start < endIndex) {
+        // compare
+        if (Math.abs((long)nums[start]-nums[end]) <= t)
           return true;
-        // 移动k window，删除最前的bucket
-        if (buckets.size() >= k) {
-          long foremostBucket = ((long)nums[i-k] - offset) / range;
-          buckets.remove(foremostBucket);
+        // out of k window or to end index
+        if ((end - start) >= k || end >= endIndex) {
+          start++;
+          end = t != 0 ? start+1 : end;
         }
-        // 插入bucket
-        buckets.put(bucket, remappedNum);
+        // [start,end] in k range
+        else
+          end++;
       }
       return false;
     }
   }
-  
-  @Author(name = "user8982", 
-      referenceUrls = "https://leetcode.com/problems/contains-duplicate-iii/discuss/61655/Java-O(N-lg-K)-solution/144810")
-  @Author(name = "jmnarloch", significant = true, 
-    referenceUrls = "https://leetcode.com/problems/contains-duplicate-iii/discuss/61655/Java-O(N-lg-K)-solution")
-  @Submission(runtime = 27, runtimeBeatRate = 30.72, memory = 36.3, memoryBeatRate =  82.33,
-      date = "2019-05-14", status = Status.ACCEPTED,
-      url = "https://leetcode.com/submissions/detail/228760292/")
-  @Solution(spaceComplexity = Complexity.O_K, timeComplexity = Complexity.O_N_LOG_K)
-  public static class SolutionByBST implements ContainsDuplicateIII {
 
-    /**
-     * 思路：将指定大小k的元素排序，新的元素进来时与最接近的值比较是否满足<=t即可
-     * <p>实现：使用binary search tree数据结构，高效的实现对k个元素排序的 同时不断的移动
-     */
-    @Override
-    public boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
-      if (k < 1 || t < 0 || nums.length == 0)
-        return false;
-      // 保存k个有序的nums元素，并不断的向前移动window
-      java.util.NavigableSet<Long> sortedNums = new TreeSet<>();
-      for (int i = 0; i < nums.length; i++) {
-        final long num = nums[i];
-        // 在k范围内存在相同的值
-        if (sortedNums.contains(num))
-          return true;
-        // 只要获取sortedNums存在比num大的，不需要最大的
-        Long ceilingNum = sortedNums.ceiling(num);
-        if (ceilingNum != null && ceilingNum - num <= t)
-          return true;
-        Long floorNum = sortedNums.floor(num);
-        if (floorNum != null && num - floorNum <= t)
-          return true;
-        
-        // 当i>=k时 set sortedNums必定size >= k
-//        if (i >= k) {
-        // 相比i>=k 更可读
-        // 移动 保证k window的大小为k个元素
-        if (sortedNums.size() >= k) {
-          long foremostNum = nums[i - k];
-          sortedNums.remove(foremostNum);
-        }
-        sortedNums.add(num);
-      }
-      return false;
-    }
+  public static void main(String[] args) {
+    int[] nums = {8,1,1,6,7,5,9};
+    int k = 3, t = 0;
+    ContainsDuplicateIII p = new ErrorSolutionBySlidingWindow();
+    System.out.println(p.containsNearbyAlmostDuplicate(nums, k, t));
   }
 }
+
+  
