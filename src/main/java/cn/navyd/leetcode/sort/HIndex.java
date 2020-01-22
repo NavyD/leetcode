@@ -1,15 +1,15 @@
 package cn.navyd.leetcode.sort;
 
 import java.util.Arrays;
+
+import cn.navyd.annotation.algorithm.ComplexityEnum;
+import cn.navyd.annotation.algorithm.SortAlgorithm;
+import cn.navyd.annotation.algorithm.TimeComplexity;
 import cn.navyd.annotation.leetcode.Author;
+import cn.navyd.annotation.leetcode.DateTime;
+import cn.navyd.annotation.leetcode.DifficultyEnum;
 import cn.navyd.annotation.leetcode.Problem;
-import cn.navyd.annotation.leetcode.Problem.Difficulty;
-import cn.navyd.annotation.leetcode.Problem.Tag;
-import cn.navyd.annotation.leetcode.Solution;
-import cn.navyd.annotation.leetcode.Solution.Complexity;
 import cn.navyd.annotation.leetcode.Submission;
-import cn.navyd.annotation.leetcode.Submission.Status;
-import cn.navyd.annotation.leetcode.Unskilled;
 
 /**
 <pre>
@@ -30,9 +30,7 @@ Note: If there are several possible values for h, the maximum one is taken as th
  * @author navyd
  * ps: 这个题目有点难懂,h-index的定义有点混乱
  */
-@Unskilled
-@Problem(title = "H-Index", number = 274, difficulty = Difficulty.MEDIUM, tags = Tag.SORT, 
-url = "https://leetcode.com/problems/h-index/")
+@Problem(number = 274, difficulty = DifficultyEnum.MEDIUM)
 public interface HIndex {
   /**
    * h-index被定义为第一个 被引用的次数h >= 被引用论文的数量之和。
@@ -40,19 +38,16 @@ public interface HIndex {
    * @param citations
    * @return
    */
-  public int hIndex(int[] citations); 
-  
-  
-  @Author(name = "yfcheng", significant = true, 
-      referenceUrls = "https://leetcode.com/problems/h-index/discuss/70768/Java-bucket-sort-O(n)-solution-with-detail-explanation")
-  @Submission(date = "2019-05-14", status = Status.ACCEPTED,
-      runtime = 0, runtimeBeatRate = 100.00, memory = 34.9, memoryBeatRate = 93.48,
-      url = "https://leetcode.com/submissions/detail/228785686/")
+  public int hIndex(int[] citations);   
+
+  @Author(value = "力扣 (LeetCode)", references = "https://leetcode-cn.com/problems/h-index/solution/hzhi-shu-by-leetcode/")
+  @Author("navyd")
+  @Submission(submittedDate = @DateTime("20200112"), runtime = 0, runtimeBeatRate = 100.00, memory = 37.4, memoryBeatRate = 100, url = "https://leetcode.com/submissions/detail/293364295/")
+  @Author(value = "yfcheng", references = "https://leetcode.com/problems/h-index/discuss/70768/Java-bucket-sort-O(n)-solution-with-detail-explanation")
+  @Submission(submittedDate = @DateTime("20190514"), runtime = 0, runtimeBeatRate = 100.00, memory = 34.9, memoryBeatRate = 93.48, url = "https://leetcode.com/submissions/detail/228785686/")
   // submission中无法查询到memoryBeatRate，超过能够显示的内存
-  @Submission(date = "2019-04-12",
-      runtime = 0, runtimeBeatRate = 100.00, memory = 37.7, memoryBeatRate = 0.00,
-      url = "https://leetcode.com/submissions/detail/221903890/")
-  @Solution(tags = Tag.SORT_BUCKET, timeComplexity = Complexity.O_N, spaceComplexity = Complexity.O_N)
+  @Submission(submittedDate = @DateTime("20190412"), runtime = 0, runtimeBeatRate = 100.00, memory = 37.7, memoryBeatRate = 0.00, url = "https://leetcode.com/submissions/detail/221903890/")
+  @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N), spaceComplexity = ComplexityEnum.O_N)
   public static class SolutionByBucketSort implements HIndex {
     /**
      * 思路：统计每个citation对应的论文数量，然后从大的citation遍历，对应的数量之和超过citation时，这个citation就是h-index，
@@ -61,38 +56,68 @@ public interface HIndex {
      * <p>使用桶排序，每个桶保存同citation的论文数量。此时的citation不只是桶的下标，也是论文的数量
      * <p>将citation分为n+1个桶，从0桶开始。citation >= n的保存到n桶中，由于h不可能超过论文数量，统计超过的数量即可
      * <p>从前往后遍历，统计citation对应的论文数量之和count，如果count>=citation即得到h-index: citation
+     * <p>问题
+     * <ul>
+     * <li>为何papers>=h，如何解释problem的条件定义到实现中
+     * </ul>
      */
     @Override
     public int hIndex(int[] citations) {
       final int n = citations.length;
-      // 分配bucket
-      int[] buckets = new int[n+1];
-      // 统计每个citation桶的对应论文数量
-      for (int citation : citations) {
-        // 超过的引用数量 在一起统计
-        if (citation >= n)
-          buckets[n]++;
-        else 
-          buckets[citation]++;
-      }
-      int paperCount = 0;
-      for (int citation = n; citation >= 0; citation--) {
-        // 统计论文数量
-        paperCount += buckets[citation];
-        // 如果总的论文数量超过当前的citation，则返回数量citation个
-        if (paperCount >= citation)
-          return citation;
+      // 0. create counts with citation index
+      int[] counts = new int[n+1];
+      for (int c : citations)
+        // count as n if over n, because of "other N − h papers"
+        counts[(c > n ? n : c)]++;
+      int papers = 0;
+      // 1. iterative h from n--
+      for (int h = n; h >= 0; h--) {
+        papers += counts[h];
+        // 2. check papers and h index
+        if (papers >= h)
+          return h;
       }
       return 0;
     }
   }
+
+  public static class Solution implements HIndex {
+    /**
+     * 思路：倒序中{@code citations[i] > i}找最大的i，0-i个论文至少都有i+1个citation，只要找最大的i就可
+     * <p>问题
+     * <ul>
+     * <li>为何从后往前遍历条件{@code citations[h] <= h+1}不行，而从前到后就可以
+     * </ul>
+     */
+    @Override
+    public int hIndex(int[] citations) {
+      Arrays.sort(citations);
+      final int n = citations.length;
+      int h = 0;
+      while (h < n && citations[n-1-h] > h) h++;
+      return h;
+    }
+
+
+  }
+
+
+  public static void main(String[] args) {
+    HIndex p = new Solution();
+    int[] citations = {3,0,6,1,5};
+    System.out.println(p.hIndex(citations));
+  }
+
+
+
+
+
   
-  @Author(name = "han35", referenceUrls = "https://leetcode.com/problems/h-index/discuss/70808/Simple-Java-solution-with-sort/73010")
-  @Author(name = "novice00", significant = true, referenceUrls = "https://leetcode.com/problems/h-index/discuss/70808/Simple-Java-solution-with-sort")
-  @Submission(date = "2019-05-15", status = Status.ACCEPTED, 
+  @Author(value = "han35", references = "https://leetcode.com/problems/h-index/discuss/70808/Simple-Java-solution-with-sort/73010")
+  @Author(value = "novice00",  references = "https://leetcode.com/problems/h-index/discuss/70808/Simple-Java-solution-with-sort")
+  @Submission(submittedDate = @DateTime("20190515"),  
   runtime = 1, runtimeBeatRate = 81.61, memory = 34.5, memoryBeatRate = 99.67,
   url = "https://leetcode.com/submissions/detail/228978719/")
-  @Solution(timeComplexity = Complexity.O_N_LOG_N, spaceComplexity = Complexity.O_1)
   public static class SolutionBySort implements HIndex {
 
     /**
@@ -118,11 +143,10 @@ public interface HIndex {
     }
   }
   
-  @Author(name = "oreomilkshake", referenceUrls = "https://leetcode.com/problems/h-index/discuss/70808/Simple-Java-solution-with-sort/73008")
-  @Submission(date = "2019-05-15", status = Status.ACCEPTED, 
+  @Author(value = "oreomilkshake", references = "https://leetcode.com/problems/h-index/discuss/70808/Simple-Java-solution-with-sort/73008")
+  @Submission(submittedDate = @DateTime("20190515"),  
   runtime = 1, runtimeBeatRate = 81.61, memory = 35.1, memoryBeatRate = 98.91,
   url = "https://leetcode.com/submissions/detail/228970601/")
-  @Solution(timeComplexity = Complexity.O_N_LOG_N, spaceComplexity = Complexity.O_1)
   public static class SolutionBySortEndToStart implements HIndex {
 
     /**
