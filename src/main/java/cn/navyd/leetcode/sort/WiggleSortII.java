@@ -2,16 +2,12 @@ package cn.navyd.leetcode.sort;
 
 import java.util.Arrays;
 import java.util.Random;
+
 import cn.navyd.annotation.leetcode.Author;
-import cn.navyd.annotation.leetcode.DerivedFrom;
+import cn.navyd.annotation.leetcode.DateTime;
+import cn.navyd.annotation.leetcode.DifficultyEnum;
 import cn.navyd.annotation.leetcode.Problem;
-import cn.navyd.annotation.leetcode.Problem.Difficulty;
-import cn.navyd.annotation.leetcode.Problem.Tag;
-import cn.navyd.annotation.leetcode.Solution;
-import cn.navyd.annotation.leetcode.Solution.Complexity;
 import cn.navyd.annotation.leetcode.Submission;
-import cn.navyd.annotation.leetcode.Unskilled;
-import cn.navyd.leetcode.heap.KthLargestElementinanArray; 
 
 /**
 <pre>
@@ -33,8 +29,7 @@ Can you do it in O(n) time and/or in-place with O(1) extra space?
 </pre>
  *
  */
-@Unskilled
-@Problem(number = 324, tags = Tag.SORT, difficulty = Difficulty.MEDIUM, url = "https://leetcode.com/problems/wiggle-sort-ii/")
+@Problem(number = 324, difficulty = DifficultyEnum.MEDIUM)
 public interface WiggleSortII {
   /**
    * wiggle sorted：任意的odd（下标）元素大于其两个even neighbor元素
@@ -53,12 +48,68 @@ public interface WiggleSortII {
    * @param nums
    */
   public void wiggleSort(int[] nums);
+
+ 
+
+
+
+
+public static class SolutionBy implements WiggleSortII {
+  @Override
+  public void wiggleSort(int[] nums) {
+    // sort 
+    Arrays.sort(nums);
+    //  index of big nums
+    final int mid = (nums.length/2);
+    // put position
+    int i = nums.length - 1, j = -1;
+    while (i >= mid) 
+      swap(nums, i--, j+=2);
+  }
+
+  static void swap(int[] nums, int i, int j) {
+    int t = nums[i];
+    nums[i] = nums[j];
+    nums[j] = t;
+  }
+}
+
+
+public static void main(String[] args) {
+  WiggleSortII p = new SolutionBy();
+  int[] nums = {1,5,1,1,6,4};
+  p.wiggleSort(nums);
   
-  @Author(name = "fun4LeetCode", significant = true, 
-      referenceUrls = "https://leetcode.com/problems/wiggle-sort-ii/discuss/77684/Summary-of-the-various-solutions-to-Wiggle-Sort-for-your-reference")
-  @Submission(date = "2019-05-04", runtime = 3, runtimeBeatRate = 99.76, memory = 42.2,
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  @Author(value = "fun4LeetCode",  
+      references = "https://leetcode.com/problems/wiggle-sort-ii/discuss/77684/Summary-of-the-various-solutions-to-Wiggle-Sort-for-your-reference")
+  @Submission(submittedDate = @DateTime("20190504"), runtime = 3, runtimeBeatRate = 99.76, memory = 42.2,
       memoryBeatRate = 27.27, url = "https://leetcode.com/submissions/detail/226655576/")
-  @Solution(spaceComplexity = Complexity.O_N, timeComplexity = Complexity.O_N_LOG_N)
   public static class SolutionBySort implements WiggleSortII {
 
     /**
@@ -83,14 +134,12 @@ public interface WiggleSortII {
     }
   }
   
-  @Author(name = "thallam",
-      referenceUrls = "https://leetcode.com/problems/wiggle-sort-ii/discuss/77682/Step-by-step-explanation-of-index-mapping-in-Java/254983")
-  @Author(name = "shuoshankou", significant = true,
-      referenceUrls = "https://leetcode.com/problems/wiggle-sort-ii/discuss/77682/Step-by-step-explanation-of-index-mapping-in-Java")
-  @Submission(date = "2019-05-04", runtime = 4, runtimeBeatRate = 69.32, memory = 41,
+  @Author(value = "thallam",
+      references = "https://leetcode.com/problems/wiggle-sort-ii/discuss/77682/Step-by-step-explanation-of-index-mapping-in-Java/254983")
+  @Author(value = "shuoshankou", 
+      references = "https://leetcode.com/problems/wiggle-sort-ii/discuss/77682/Step-by-step-explanation-of-index-mapping-in-Java")
+  @Submission(submittedDate = @DateTime("20190504"), runtime = 4, runtimeBeatRate = 69.32, memory = 41,
       memoryBeatRate = 56.82, url = "https://leetcode.com/submissions/detail/226646664/")
-  @DerivedFrom(SolutionBySort.class)
-  @Solution(timeComplexity = Complexity.O_N_LOG_N, spaceComplexity = Complexity.O_N)
   public static class SolutionBySortII implements WiggleSortII {
 
     /**
@@ -118,11 +167,10 @@ public interface WiggleSortII {
     }
   }
   
-  @Author(name = "fun4LeetCode", significant = true,
-      referenceUrls = "https://leetcode.com/problems/wiggle-sort-ii/discuss/77684/Summary-of-the-various-solutions-to-Wiggle-Sort-for-your-reference")
-  @Submission(date = "2019-05-09", runtime = 70, runtimeBeatRate = 23.57, memory = 41,
+  @Author(value = "fun4LeetCode", 
+      references = "https://leetcode.com/problems/wiggle-sort-ii/discuss/77684/Summary-of-the-various-solutions-to-Wiggle-Sort-for-your-reference")
+  @Submission(submittedDate = @DateTime("20190509"), runtime = 70, runtimeBeatRate = 23.57, memory = 41,
       memoryBeatRate = 55.11, url = "https://leetcode.com/submissions/detail/227709646/")
-  @Solution(timeComplexity = Complexity.O_N, spaceComplexity = Complexity.O_N)
   public static class SolutionByMedianPartition implements WiggleSortII {
     /**
      * 使用一个中值median将nums划分两部分。
@@ -217,13 +265,12 @@ public interface WiggleSortII {
     }
   }
   
-  @Author(name = "fun4LeetCode", significant = true,
-      referenceUrls = "https://leetcode.com/problems/wiggle-sort-ii/discuss/77684/Summary-of-the-various-solutions-to-Wiggle-Sort-for-your-reference")
-  @Author(name = "shuoshankou", significant = true,
-      referenceUrls = "https://leetcode.com/problems/wiggle-sort-ii/discuss/77682/Step-by-step-explanation-of-index-mapping-in-Java")
-  @Submission(date = "2019-05-11", runtime = 33, runtimeBeatRate = 41.09, memory = 41,
+  @Author(value = "fun4LeetCode", 
+      references = "https://leetcode.com/problems/wiggle-sort-ii/discuss/77684/Summary-of-the-various-solutions-to-Wiggle-Sort-for-your-reference")
+  @Author(value = "shuoshankou", 
+      references = "https://leetcode.com/problems/wiggle-sort-ii/discuss/77682/Step-by-step-explanation-of-index-mapping-in-Java")
+  @Submission(submittedDate = @DateTime("20190511"), runtime = 33, runtimeBeatRate = 41.09, memory = 41,
       memoryBeatRate = 57.95, url = "https://leetcode.com/submissions/detail/228161720/")
-  @Solution(timeComplexity = Complexity.O_N, spaceComplexity = Complexity.O_1)
   public static class SolutionByCombiningPartitionAndPlacement extends SolutionByMedianPartition {
 
     /**
