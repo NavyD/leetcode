@@ -2,14 +2,10 @@ package cn.navyd.leetcode.sort;
 
 import java.util.Arrays;
 import cn.navyd.annotation.leetcode.Author;
-import cn.navyd.annotation.leetcode.DerivedFrom;
+import cn.navyd.annotation.leetcode.DateTime;
+import cn.navyd.annotation.leetcode.DifficultyEnum;
 import cn.navyd.annotation.leetcode.Problem;
-import cn.navyd.annotation.leetcode.Problem.Difficulty;
-import cn.navyd.annotation.leetcode.Problem.Tag;
-import cn.navyd.annotation.leetcode.Solution;
-import cn.navyd.annotation.leetcode.Solution.Complexity;
 import cn.navyd.annotation.leetcode.Submission;
-import cn.navyd.annotation.leetcode.Unskilled;
 
 /**
  * <pre>
@@ -36,16 +32,13 @@ Try to solve it in linear time/space.
  * @author navyd
  *
  */
-@Unskilled
-@Problem(number = 164, difficulty = Difficulty.HARD, tags = Tag.SORT,
-    url = "https://leetcode.com/problems/maximum-gap/")
+@Problem(number = 164, difficulty = DifficultyEnum.HARD, url = "https://leetcode.com/problems/maximum-gap/")
 public interface MaximumGap {
   public int maximumGap(int[] nums);
 
-  @Author(name = "navyd")
-  @Submission(date = "2019-06-04", memory = 35.9, memoryBeatRate = 99.89, runtime = 5,
+  @Author(value = "navyd")
+  @Submission(submittedDate = @DateTime("20190604"), memory = 35.9, memoryBeatRate = 99.89, runtime = 5,
       runtimeBeatRate = 33.99, url = "https://leetcode.com/submissions/detail/233472726/")
-  @Solution(spaceComplexity = Complexity.O_1, timeComplexity = Complexity.O_N_LOG_N)
   public static class SolutionBySimple implements MaximumGap {
 
     /**
@@ -71,15 +64,14 @@ public interface MaximumGap {
   }
   
   // 解释为何比较相邻间隔
-  @Author(name = "hot13399", referenceUrls = "https://leetcode.com/problems/maximum-gap/discuss/50643/bucket-sort-JAVA-solution-with-explanation-O(N)-time-and-space/51216")
+  @Author(value = "hot13399", references = "https://leetcode.com/problems/maximum-gap/discuss/50643/bucket-sort-JAVA-solution-with-explanation-O(N)-time-and-space/51216")
   // 解释为何最大间隔为ceiling((max-min)/(n-1))
-  @Author(name = "sherryli", referenceUrls = "https://leetcode.com/problems/maximum-gap/discuss/50643/bucket-sort-JAVA-solution-with-explanation-O(N)-time-and-space/200059")
+  @Author(value = "sherryli", references = "https://leetcode.com/problems/maximum-gap/discuss/50643/bucket-sort-JAVA-solution-with-explanation-O(N)-time-and-space/200059")
   // 解释为何同一个桶不需要比较间隔
-  @Author(name = "teddyyyy", referenceUrls = "https://leetcode.com/problems/maximum-gap/discuss/50643/bucket-sort-JAVA-solution-with-explanation-O(N)-time-and-space/51251")
-  @Author(name = "zkfairytale", significant = true, 
-    referenceUrls = "https://leetcode.com/problems/maximum-gap/discuss/50643/bucket-sort-JAVA-solution-with-explanation-O(N)-time-and-space")
-  @Submission(date = "2019-06-09", memory = 37, memoryBeatRate = 99.42, runtime = 2, runtimeBeatRate = 99.34, url = "https://leetcode.com/submissions/detail/234650389/")
-  @Solution(spaceComplexity = Complexity.O_N, timeComplexity = Complexity.O_N)
+  @Author(value = "teddyyyy", references = "https://leetcode.com/problems/maximum-gap/discuss/50643/bucket-sort-JAVA-solution-with-explanation-O(N)-time-and-space/51251")
+  @Author(value = "zkfairytale", 
+    references = "https://leetcode.com/problems/maximum-gap/discuss/50643/bucket-sort-JAVA-solution-with-explanation-O(N)-time-and-space")
+  @Submission(submittedDate = @DateTime("20190609"), memory = 37, memoryBeatRate = 99.42, runtime = 2, runtimeBeatRate = 99.34, url = "https://leetcode.com/submissions/detail/234650389/")
   public static class SolutionByBucketSort implements MaximumGap {
 
     /**
@@ -93,7 +85,21 @@ public interface MaximumGap {
      * 所以在gap间隔的都在同一个桶中，超过的需要在相邻的桶中寻找即可
      * <p>比较相邻桶的间隔，由于同一个桶的间隔为maxGap，要比较相邻桶的间隔，仅需要比较相邻桶的最大最小值，
      * <p>桶不保存nums最大最小值max, min. 
+     * 最大值不入桶(max-min)/((max-min)/n-1)下标是n-1，超出界限buckets[n-1]
      * <p>为什么最大最小值不入桶，且最后更新maxGap为何使用max-prev？
+     * 当元素存在有过大的gap时，入桶时会有多个元素到一个桶，导到其它桶存在空桶的情况，但是按实际排序来看，
+     * 两个桶间存在者许多空桶时，这两个桶最大最小元素是相邻的，即可以减
+     * 
+     * 为何比较相邻桶最大小值就能使max gap：
+     * 
+     * 由于total_gap=max-min，平均avg_gap=total_gap/(n-1)总的gap为n-1个，且如果相邻gap有小就有大，
+     * 总的gap是不变的，即最大gap是在相邻gap中出现的
+     * 
+     * 同个gap中的元素是不用比较的，其中最大gap就是gap，但相邻gap就要比较，
+     * gap桶是另一个形式的排序：入桶时找每个num对应的下标需要相对位置(num-min)/gap比较n次，再找每个桶的
+     * 最大最小值也是n次
+     * 
+     * 为何1<bucket_size<=(max-min)/(n-1)：大于了(max-min)/(n-1)将导致maxgap到一个桶，无法通过相邻比较出来
      */
     @Override
     public int maximumGap(int[] nums) {
@@ -151,9 +157,7 @@ public interface MaximumGap {
     }
   }
   
-  @DerivedFrom(SolutionByBucketSort.class)
-  @Submission(date = "2019-06-13", memory = 36.4, memoryBeatRate = 99.61, runtime = 2, runtimeBeatRate = 99.32, url = "https://leetcode.com/submissions/detail/235587536/")
-  @Solution(spaceComplexity = Complexity.O_N, timeComplexity = Complexity.O_N)
+  @Submission(submittedDate = @DateTime("20190613"), memory = 36.4, memoryBeatRate = 99.61, runtime = 2, runtimeBeatRate = 99.32, url = "https://leetcode.com/submissions/detail/235587536/")
   public static class SolutionByBucketSortII implements MaximumGap {
     /**
      * 思路：相对于{@link SolutionByBucketSort}而言，最大的不同是，将min入桶，max不入桶。{@link SolutionByBucketSort}则是min,max都不入桶
@@ -206,10 +210,9 @@ public interface MaximumGap {
   }
   
   // 解释为何radixsort 后序重排
-  @Author(name = "HauserZ", referenceUrls = "https://leetcode.com/problems/maximum-gap/discuss/50642/Radix-sort-solution-in-Java-with-explanation/279550")
-  @Author(name = "Alexpanda", significant = true, referenceUrls = "https://leetcode.com/problems/maximum-gap/discuss/50642/Radix-sort-solution-in-Java-with-explanation")
-  @Submission(date = "2019-06-16", memory = 37.1, memoryBeatRate = 99.33, runtime = 5, runtimeBeatRate = 34.17, url = "https://leetcode.com/submissions/detail/236199369/")
-  @Solution(timeComplexity = Complexity.O_N, spaceComplexity = Complexity.O_N)
+  @Author(value = "HauserZ", references = "https://leetcode.com/problems/maximum-gap/discuss/50642/Radix-sort-solution-in-Java-with-explanation/279550")
+  @Author(value = "Alexpanda", references = "https://leetcode.com/problems/maximum-gap/discuss/50642/Radix-sort-solution-in-Java-with-explanation")
+  @Submission(submittedDate = @DateTime("20190616"), memory = 37.1, memoryBeatRate = 99.33, runtime = 5, runtimeBeatRate = 34.17, url = "https://leetcode.com/submissions/detail/236199369/")
   public static class SolutionByRadixSort implements MaximumGap {
 
     /**
