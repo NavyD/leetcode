@@ -5,12 +5,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import cn.navyd.annotation.leetcode.Author;
+import cn.navyd.annotation.leetcode.DateTime;
+import cn.navyd.annotation.leetcode.DifficultyEnum;
 import cn.navyd.annotation.leetcode.Problem;
-import cn.navyd.annotation.leetcode.Solution;
 import cn.navyd.annotation.leetcode.Submission;
-import cn.navyd.annotation.leetcode.Solution.Complexity;
-import cn.navyd.annotation.leetcode.Problem.Difficulty;
-import cn.navyd.annotation.leetcode.Problem.Tag;
 
 /**
  * <pre>
@@ -30,17 +28,16 @@ To the right of 1 there is 0 smaller element.
  * @author navyd
  *
  */
-@Problem(number = 315, difficulty = Difficulty.HARD, tags = Tag.SORT, url = "https://leetcode.com/problems/count-of-smaller-numbers-after-self/")
+@Problem(number = 315, difficulty = DifficultyEnum.HARD, url = "https://leetcode.com/problems/count-of-smaller-numbers-after-self/")
 public interface CountOfSmallerNumbersAfterSelf {
   public List<Integer> countSmaller(int[] nums);
 
-  @Author(name = "danyfang7",
-      referenceUrls = "https://leetcode.com/problems/count-of-smaller-numbers-after-self/discuss/76583/11ms-JAVA-solution-using-merge-sort-with-explanation/143754")
-  @Author(name = "lzyfriday", significant = true,
-      referenceUrls = "https://leetcode.com/problems/count-of-smaller-numbers-after-self/discuss/76583/11ms-JAVA-solution-using-merge-sort-with-explanation")
-  @Submission(date = "2019-06-29", memory = 39.1, memoryBeatRate = 89.77, runtime = 5,
+  @Author(value = "danyfang7",
+      references = "https://leetcode.com/problems/count-of-smaller-numbers-after-self/discuss/76583/11ms-JAVA-solution-using-merge-sort-with-explanation/143754")
+  @Author(value = "lzyfriday",
+      references = "https://leetcode.com/problems/count-of-smaller-numbers-after-self/discuss/76583/11ms-JAVA-solution-using-merge-sort-with-explanation")
+  @Submission(submittedDate = @DateTime("20190629"), memory = 39.1, memoryBeatRate = 89.77, runtime = 5,
       runtimeBeatRate = 90.75, url = "https://leetcode.com/submissions/detail/239393643/")
-  @Solution(spaceComplexity = Complexity.O_N_LOG_N, timeComplexity = Complexity.O_N)
   public static class SolutionByMergeSort implements CountOfSmallerNumbersAfterSelf {
 
     /**
@@ -131,9 +128,136 @@ public interface CountOfSmallerNumbersAfterSelf {
     }
   }
 
+  // 动画详解
+  @Author(value = "liweiwei1419", references = "https://leetcode-cn.com/problems/count-of-smaller-numbers-after-self/solution/gui-bing-pai-xu-suo-yin-shu-zu-python-dai-ma-java-/")
+  // 下标
+  @Author(value = "EdickCoding", references = "https://leetcode.com/problems/count-of-smaller-numbers-after-self/discuss/76584/Mergesort-solution/80276")
+  @Submission(memory = 41.3, memoryBeatRate = 8.33, runtime = 4, runtimeBeatRate = 91.63, submittedDate = @DateTime("20200510"), url = "https://leetcode.com/submissions/detail/337082785/")
+  public class SolutionByMerge implements CountOfSmallerNumbersAfterSelf {
+    /**
+     * <p>如何在排序中计算某个元素的右边元素个数？
+     * <p>如果两个数组left,right分别有序，在合并时只要计算right移动到left前的+1就可。即当
+     * right移动到前面时，此时left元素只要计好移动过来的数量，对每个left元素移动时，其小于的数量为之前count+这次的count。
+     * 计数与下标的关系：我们用count记录right移动的次数，但是right++下标刚好是count的次数=right - (mid + 1)
+     * 替换count => counts[i]+=right - (mid + 1)，当right比left都移完时，count=hi-mid=right-(mid+1) right=hi+1不变
+     * <pre>
+     *            5,2,6,1
+     * =>         5,2  6,1
+     * =>         5 | 2
+     * => loop0:left 5 > right 2                                      idx_l=0 idx_r=0
+     * =>       count=1 temp_arr:[2, null]
+     * => loop1:counts[0](5)+=count = 1 temp_arr:[2, 5]               idx_l=0 idx_r=1
+     * 
+     * =>         6 | 1
+     * => loop0:left 6 > right 1                                      idx_l=0 idx_r=0
+     * =>       count=1 temp_arr:[1, null]
+     * => loop1: counts[2](6)+=count = 1 temp_arr:[1, 6]              idx_l=0 idx_r=1
+     * 
+     * =>         2,5 | 1,6
+     * => loop0:left 2 > right 1                                      idx_l=0 idx_r=0
+     * =>       count=1 temp_arr:[1,null,null,null]
+     * => loop1:left 2 < right 6                                      idx_l=0 idx_r=1
+     * =>       counts[1](2)+=count = 1 temp_arr:[1,2,null,null]
+     * => loop2:left 5 < right 6                                      idx_l=1 idx_r=1
+     * =>       counts[0](5)+=count = 2 temp_arr:[1,2,5,null]
+     * => loop3:right 6                                               idx_l=2 idx_r=1
+     * => the right side is the largest, we dont need to count
+     * </pre>
+     * <p>如何定位元素
+     * 由于在排序数组时不能保证找到同一个元素，在排序后要能定位，必须保留num对应的index，可通过
+     * index排序保证nums不修改一样即nums[indexes[i]]
+     */
+    @Override
+    public List<Integer> countSmaller(int[] nums) {
+      final int n = nums.length;
+      List<Integer> res = new ArrayList<>(n);
+      if (n == 0)
+        return res;
+      if (n == 1) {
+        res.add(0);
+        return res;
+      }
+      // counts indexes
+      final int[] counts = new int[n], indexes = new int[n], auxIndexes = new int[n];
+      for (int i = 0; i < n; i++)
+        indexes[i] = i;
+      mergeSort(nums, counts, indexes, auxIndexes, 0, n - 1);
+      for (int c : counts)
+        res.add(c);
+      return res;
+    }
+
+    static void mergeSort(int[] nums, int[] counts, int[] indexes, int[] auxIndexes, int lo, int hi) {
+      // recursion terminated
+      if (lo >= hi)
+        return;
+      // left
+      int mid = lo + (hi - lo) / 2;
+      mergeSort(nums, counts, indexes, auxIndexes, lo, mid);
+      // right
+      mergeSort(nums, counts, indexes, auxIndexes, mid + 1, hi);
+      // merge from 1 to all
+      mergeWithIdx(nums, counts, indexes, auxIndexes, lo, mid, hi);
+    }
+
+    static void mergeWithCount(int[] nums, int[] counts, int[] indexes, int[] auxIndexes, int lo, int mid, int hi) {
+      for (int i = lo; i <= hi; i++)
+        auxIndexes[i] = indexes[i];
+      // compares left and right
+      int left = lo, right = mid + 1, i = lo;
+      int count = 0;
+      while (left <= mid && right <= hi) {
+        // not move right for stable equals
+        // right side move
+        if (nums[auxIndexes[left]] > nums[auxIndexes[right]]) {
+          indexes[i++] = auxIndexes[right++];
+          count++;
+        } else {
+          // left side move
+          counts[auxIndexes[left]] += count;
+          indexes[i++] = auxIndexes[left++];
+        }
+      }
+      // rest of the right
+      while (right <= hi)
+        indexes[i++] = auxIndexes[right++];
+      // rest of the left
+      while (left <= mid) {
+        counts[auxIndexes[left]] += count;
+        indexes[i++] = auxIndexes[left++];
+      }
+    }
+
+    static void mergeWithIdx(int[] nums, int[] counts, int[] indexes, int[] auxIndexes, int lo, int mid, int hi) {
+      for (int i = lo; i <= hi; i++)
+        auxIndexes[i] = indexes[i];
+      // compares left and right
+      int left = lo, right = mid + 1, i = lo;
+      while (left <= mid && right <= hi) {
+        // not move right for stable equals
+        // right side move
+        if (nums[auxIndexes[left]] > nums[auxIndexes[right]]) {
+          indexes[i++] = auxIndexes[right++];
+        } else {
+          // left side move
+          counts[auxIndexes[left]] += right - (mid + 1);
+          indexes[i++] = auxIndexes[left++];
+        }
+      }
+      // rest of the right
+      while (right <= hi)
+        indexes[i++] = auxIndexes[right++];
+      // rest of the left
+      while (left <= mid) {
+        counts[auxIndexes[left]] += right - (mid + 1);
+        indexes[i++] = auxIndexes[left++];
+      }
+    }
+  }
+
   public static void main(String[] args) {
     int[] a = {5, 2, 6, 1};
-    CountOfSmallerNumbersAfterSelf test = new SolutionByMergeSort();
+    CountOfSmallerNumbersAfterSelf test = new SolutionByMerge();
     System.out.println("count: " + test.countSmaller(a));
   }
 }
