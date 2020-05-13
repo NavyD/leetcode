@@ -3,7 +3,12 @@ package cn.navyd.leetcode.sort;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
 import cn.navyd.annotation.leetcode.Author;
 import cn.navyd.annotation.leetcode.DateTime;
 import cn.navyd.annotation.leetcode.DifficultyEnum;
@@ -255,9 +260,106 @@ public interface CountOfSmallerNumbersAfterSelf {
     }
   }
 
+  @Author(value = "liweiwei1419", references = "https://leetcode-cn.com/problems/count-of-smaller-numbers-after-self/solution/shu-zhuang-shu-zu-by-liweiwei1419/")
+  @Submission(memory = 42.2, memoryBeatRate = 5.55, runtime = 10, runtimeBeatRate = 55.63, submittedDate = @DateTime("20200513"), url = "https://leetcode.com/submissions/detail/338657142/")
+  public static class SolutionByFenwickTree implements CountOfSmallerNumbersAfterSelf {
+    /**
+     * 思路：使用FenwickTree树状数组计算每个元素的前缀和。
+     * <p>FenwickTree如何计算nums数小的数量？
+     * 
+     * 由于tree的特殊性，让nums放在tree中可以快速计算指定元素前的所有元素之和。只要
+     * 将nums从后往前入tree，就可以得到当前元素右边小的元素之和。
+     * 
+     * tree不能存储nums的值，因为要求的是数量个数。考虑到nums可能有重复值出现，
+     * 而题意只要求小的数，那么重复的数就不应该占多余空间，直接存储nums的下标是会
+     * 浪费空间的。tree应该存储的是去重后的set的下标与出现的次数。
+     * 
+     * <p>set与次数在tree如何工作？
+     * 
+     * 当从后往前nums时，将set下标rank和次数1更新到tree中，然后找比当前num小的数rank-1
+     * 以前的所有和（出现次数）。如果nums遇到相同的num，set的下标rank是一样的，但更新到
+     * tree时update rank,1使出现次数+1，可被统计到小于元素中
+     * 
+     * <p>如何找到set与次数？
+     * 
+     * 用TreeSet去重和排序，再遍历set时可用map关联 num,rank。这个叫离散化，将元素的值
+     * 用相对排名处理，只关心大小顺序
+     * 
+     * 在后面遍历nums构造tree时，可通过num与map查到出同次数
+     * 
+     * <p>为何FenwickTree(set.size+1)？
+     * 用的是set中的下标作为tree，由于tree数组0下标不用，则多加一个
+     * 
+     * <p>时间复杂度：FenwickTree.update getsum是logN，即为O(NlogN)
+     * <p>空间：O(N)
+     */
+    @Override
+    public List<Integer> countSmaller(int[] nums) {
+      List<Integer> res = new ArrayList<>(nums.length);
+      if (nums.length == 0)
+        return res;
+      if (nums.length == 1) {
+        res.add(0);
+        return res;
+      }
+      // 离散化 计算nums的排名ranks 减少tree空间
+      Set<Integer> set = new TreeSet<>();
+      // set去重 排序
+      for (int num : nums) {
+        set.add(num);
+      }
+      Map<Integer, Integer> ranks = new HashMap<>();
+      int count = 1;
+      for (Integer n : set) {
+        ranks.put(n, count++);
+      }
+      // 从后往前更新线段树
+      FenwickTree tree = new FenwickTree(set.size() + 1);
+      for (int i = nums.length - 1; i >= 0; i--) {
+        int rank = ranks.get(nums[i]);
+        tree.update(rank, 1);
+        res.add(tree.getSum(rank-1));
+      }
+      Collections.reverse(res);
+      return res;
+    }
+
+    private static class FenwickTree {
+      private final int[] bits;
+      private final int length;
+
+      public FenwickTree(int length) {
+        this.length = length;
+        this.bits = new int[length + 1];
+      }
+
+      public void update(int i, int val) {
+        while (i <= length) {
+          bits[i] += val;
+          i += lowbit(i);
+        }
+      }
+
+      public int getSum(int i) {
+        int sum = 0;
+        while (i > 0) {
+          sum += bits[i];
+          i -= lowbit(i);
+        }
+        return sum;
+      }
+
+      private int lowbit(int i) {
+        return i&(-i);
+      }
+    }
+  }
+
+  
+
   public static void main(String[] args) {
     int[] a = {5, 2, 6, 1};
-    CountOfSmallerNumbersAfterSelf test = new SolutionByMerge();
+    CountOfSmallerNumbersAfterSelf test = new SolutionByFenwickTree();
     System.out.println("count: " + test.countSmaller(a));
   }
 }
