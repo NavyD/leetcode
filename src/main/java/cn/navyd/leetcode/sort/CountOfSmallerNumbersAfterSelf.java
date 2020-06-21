@@ -295,6 +295,7 @@ public interface CountOfSmallerNumbersAfterSelf {
      */
     @Override
     public List<Integer> countSmaller(int[] nums) {
+      Collections.shuffle(list);
       List<Integer> res = new ArrayList<>(nums.length);
       if (nums.length == 0)
         return res;
