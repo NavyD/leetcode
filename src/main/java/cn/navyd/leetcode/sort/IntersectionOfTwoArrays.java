@@ -20,24 +20,23 @@ import cn.navyd.annotation.leetcode.TagEnum;
 /**
  * <pre>
  * Given two arrays, write a function to compute their intersection.
-
-Example 1:
-
-Input: nums1 = [1,2,2,1], nums2 = [2,2]
-Output: [2]
-Example 2:
-
-Input: nums1 = [4,9,5], nums2 = [9,4,9,8,4]
-Output: [9,4]
-Note:
-
-Each element in the result must be unique.
-The result can be in any order.
- * 
- * </pre>
- * 
- * @author navyd
  *
+ * Example 1:
+ *
+ * Input: nums1 = [1,2,2,1], nums2 = [2,2]
+ * Output: [2]
+ * Example 2:
+ *
+ * Input: nums1 = [4,9,5], nums2 = [9,4,9,8,4]
+ * Output: [9,4]
+ * Note:
+ *
+ * Each element in the result must be unique.
+ * The result can be in any order.
+ *
+ * </pre>
+ *
+ * @author navyd
  */
 @Tag(TagEnum.SORT)
 @Problem(difficulty = DifficultyEnum.EASY, number = 349)
@@ -72,13 +71,15 @@ public interface IntersectionOfTwoArrays {
     @Override
     public int[] intersection(int[] nums1, int[] nums2) {
       // 查找大小数组
-      final int[] maxNums = nums1.length > nums2.length ? nums1 : nums2, minNums = maxNums != nums1 ? nums1 : nums2,
+      final int[] maxNums = nums1.length > nums2.length ? nums1 : nums2, minNums =
+          maxNums != nums1 ? nums1 : nums2,
           // 交集最多为minNums
           intersectionNums = new int[minNums.length];
       // 1. hash maxNums
       final Map<Integer, Boolean> nums = new HashMap<>(maxNums.length);
-      for (int n : maxNums)
+      for (int n : maxNums) {
         nums.put(n, true);
+      }
       int idx = 0;
       // 2. 在hash中查找minNums
       for (int n : minNums) {
@@ -121,18 +122,23 @@ public interface IntersectionOfTwoArrays {
     @Override
     public int[] intersection(int[] nums1, int[] nums2) {
       // 大小数组
-      final int[] maxNums = nums1.length > nums2.length ? nums1 : nums2, minNums = maxNums != nums1 ? nums1 : nums2,
+      final int[] maxNums = nums1.length > nums2.length ? nums1 : nums2, minNums =
+          maxNums != nums1 ? nums1 : nums2,
           intersectionNums = new int[minNums.length];
       // 1. hash maxNums
       final Set<Integer> nums = new HashSet<>(maxNums.length);
-      for (int n : maxNums)
+      for (int n : maxNums) {
         nums.add(n);
+      }
       int idx = 0;
       // 2. 在hash中查找minNums
       for (int n : minNums)
-        // 3. 查找并移除 防止重复查找
-        if (nums.remove(n))
+      // 3. 查找并移除 防止重复查找
+      {
+        if (nums.remove(n)) {
           intersectionNums[idx++] = n;
+        }
+      }
       return Arrays.copyOfRange(intersectionNums, 0, idx);
     }
   }
@@ -164,19 +170,24 @@ public interface IntersectionOfTwoArrays {
     @Override
     public int[] intersection(int[] nums1, int[] nums2) {
       // 0. find min and max array
-      final int[] maxNums = nums1.length > nums2.length ? nums1 : nums2, minNums = maxNums != nums1 ? nums1 : nums2;
+      final int[] maxNums = nums1.length > nums2.length ? nums1 : nums2, minNums =
+          maxNums != nums1 ? nums1 : nums2;
       // 1. sort max array
       Arrays.sort(maxNums);
       final Set<Integer> intersection = new HashSet<>();
       // 2. max elements binary search in max array
       for (int n : minNums)
-        // 3. to add res array
-        if (Arrays.binarySearch(maxNums, n) > -1)
+      // 3. to add res array
+      {
+        if (Arrays.binarySearch(maxNums, n) > -1) {
           intersection.add(n);
+        }
+      }
       final int[] res = new int[intersection.size()];
       int i = 0;
-      for (int n : intersection)
+      for (int n : intersection) {
         res[i++] = n;
+      }
       return res;
     }
 
@@ -207,21 +218,23 @@ public interface IntersectionOfTwoArrays {
       // 1. find iteritive with two pointers
       int i = 0, j = 0;
       final Set<Integer> intersection = new HashSet<>(Math.min(nums1.length, nums2.length));
-      while (i < nums1.length && j < nums2.length)
-        if (nums1[i] < nums2[j])
+      while (i < nums1.length && j < nums2.length) {
+        if (nums1[i] < nums2[j]) {
           i++;
-        else if (nums1[i] > nums2[j])
+        } else if (nums1[i] > nums2[j]) {
           j++;
-        else {
+        } else {
           intersection.add(nums1[i]);
           i++;
           j++;
         }
+      }
       // 2. to copy result
       final int[] res = new int[intersection.size()];
       int k = 0;
-      for (int n : intersection)
+      for (int n : intersection) {
         res[k++] = n;
+      }
       return res;
     }
   }

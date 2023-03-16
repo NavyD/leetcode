@@ -13,56 +13,59 @@ import cn.navyd.annotation.leetcode.TagEnum;
 
 /**
  * <pre>
-Given an array A of non-negative integers, half of the integers in A are odd, and half of the integers are even.
-
-Sort the array so that whenever A[i] is odd, i is odd; and whenever A[i] is even, i is even.
-
-You may return any answer array that satisfies this condition.
-
- 
-
-Example 1:
-
-Input: [4,2,5,7]
-Output: [4,5,2,7]
-Explanation: [4,7,2,5], [2,5,4,7], [2,7,4,5] would also have been accepted.
- 
-
-Note:
-
-2 <= A.length <= 20000
-A.length % 2 == 0
-0 <= A[i] <= 1000
- * </pre>
- * @author navyd
+ * Given an array A of non-negative integers, half of the integers in A are odd, and half of the integers are even.
  *
+ * Sort the array so that whenever A[i] is odd, i is odd; and whenever A[i] is even, i is even.
+ *
+ * You may return any answer array that satisfies this condition.
+ *
+ *
+ *
+ * Example 1:
+ *
+ * Input: [4,2,5,7]
+ * Output: [4,5,2,7]
+ * Explanation: [4,7,2,5], [2,5,4,7], [2,7,4,5] would also have been accepted.
+ *
+ *
+ * Note:
+ *
+ * 2 <= A.length <= 20000
+ * A.length % 2 == 0
+ * 0 <= A[i] <= 1000
+ * </pre>
+ *
+ * @author navyd
  */
 @Tag(TagEnum.SORT)
 @Problem(difficulty = DifficultyEnum.EASY, number = 922)
 public interface SortArrayByParityII {
-  
+
   /**
    * 对数组A排序。保证数组奇、偶下标分别 对应的奇、偶值
    * <p>数组A的长度是偶数，即数组奇偶元素数量一致
+   *
    * @param A
    * @return
    */
   public int[] sortArrayByParityII(int[] A);
-  
+
   @Author("navyd")
   @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N), spaceComplexity = ComplexityEnum.O_N, inplace = false)
-  @Submission(memory = 41.7, memoryBeatRate = 81.48, runtime = 2, runtimeBeatRate = 99.68, submittedDate = @DateTime("20190921"), 
-  url = "https://leetcode.com/submissions/detail/262767574/")
+  @Submission(memory = 41.7, memoryBeatRate = 81.48, runtime = 2, runtimeBeatRate = 99.68, submittedDate = @DateTime("20190921"),
+      url = "https://leetcode.com/submissions/detail/262767574/")
   public class SolutionByTwoPass implements SortArrayByParityII {
     /**
      * 思路：遍历数组，当元素为奇数时，保存新数组的奇数位置，反之亦然。
+     *
      * @param A
      * @return
      */
     public int[] sortArrayByParityII(int[] A) {
       final int n;
-      if (A == null || (n = A.length) <= 1)
+      if (A == null || (n = A.length) <= 1) {
         return A;
+      }
       final int[] res = new int[n];
       // 奇数起始下标， 偶数起始下标
       int oIdx = 1, eIdx = 0;
@@ -79,9 +82,9 @@ public interface SortArrayByParityII {
       return res;
     }
   }
-  
+
   @Author("navyd")
-  @Submission(memory = 40.3, memoryBeatRate = 100, runtime = 2, runtimeBeatRate = 99.66, submittedDate = @DateTime("20190922"), 
+  @Submission(memory = 40.3, memoryBeatRate = 100, runtime = 2, runtimeBeatRate = 99.66, submittedDate = @DateTime("20190922"),
       url = "https://leetcode.com/submissions/detail/263022300/")
   @SortAlgorithm(spaceComplexity = ComplexityEnum.O_1, timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N), inplace = true, inputDependency = true)
   public class SolutionBySwap implements SortArrayByParityII {
@@ -91,12 +94,12 @@ public interface SortArrayByParityII {
      * <p>Process
      * <pre>
      * Indexes eIdx is 0, 2, 4..., oIdx is 1, 3, 5...
-     * 
+     *
      * while (oIdx < n && eIdx < n)
-     * 
+     *
      * if eIdx_val is even, then eIdx += 2
-     * 
-     * else eIdx_val is odd, then 
+     *
+     * else eIdx_val is odd, then
      *  (improvable: find oIdx_val == even index)
      *  swap(eIdx, oIdx)
      *  oIdx += 2
@@ -113,25 +116,28 @@ public interface SortArrayByParityII {
      * <li>空间：O(1)
      * </ul>
      * <p>稳定性分析：否
-     * 
      */
     @Override
     public int[] sortArrayByParityII(int[] A) {
       final int n;
-      if (A == null || (n = A.length) < 2)
+      if (A == null || (n = A.length) < 2) {
         return A;
-      for (int eIdx = 0, oIdx = 1; oIdx < n && eIdx < n;) {
+      }
+      for (int eIdx = 0, oIdx = 1; oIdx < n && eIdx < n; ) {
         // 偶数下标 奇数值
         if ((A[eIdx] & 1) == 1) {
           // 找偶数值的 奇数下标 避免对奇数下标值的swap
-          while ((A[oIdx] & 1) == 1 && (oIdx += 2) < n);
+          while ((A[oIdx] & 1) == 1 && (oIdx += 2) < n) {
+            ;
+          }
           // swap 奇数下标
           int tmp = A[oIdx];
           A[oIdx] = A[eIdx];
           A[eIdx] = tmp;
           oIdx += 2;
-        } else
+        } else {
           eIdx += 2;
+        }
       }
       return A;
     }
@@ -152,11 +158,13 @@ public interface SortArrayByParityII {
       // 0. traversal
       for (int e = 0, o = 1; e < A.length; e += 2) {
         // 1. 如果偶数位置是奇数
-        if ((A[e] & 1) == 0)
+        if ((A[e] & 1) == 0) {
           continue;
+        }
         // 2. 找奇数位置的偶数
-        while ((A[o] & 1) == 1)
+        while ((A[o] & 1) == 1) {
           o += 2;
+        }
         // 3. swap e and o
         int temp = A[e];
         A[e] = A[o];

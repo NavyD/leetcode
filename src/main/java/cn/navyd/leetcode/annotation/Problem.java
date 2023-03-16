@@ -12,9 +12,9 @@ import java.lang.annotation.Target;
  * <ol>
  * <li>仅能被定义在interface
  * </ol>
- * @see Solution
- * @author navyd
  *
+ * @author navyd
+ * @see Solution
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -22,31 +22,36 @@ import java.lang.annotation.Target;
 public @interface Problem {
   /**
    * 问题的标题，默认为class的名称
+   *
    * @return
    */
   String name() default "";
-  
+
   /**
    * 问题的链接url。默认的表示从interface文件名获取
+   *
    * @return
    */
   String url() default "";
-  
+
   /**
    * 问题的编号。
+   *
    * @return
    */
   short number();
-  
+
   /**
    * 问题的难度
+   *
    * @return
    */
   DifficultyEnum difficulty();
 
   enum DifficultyEnum {
-    EASY, MEDIUM, HARD,;
+    EASY, MEDIUM, HARD,
+    ;
   }
-  
+
 }
 

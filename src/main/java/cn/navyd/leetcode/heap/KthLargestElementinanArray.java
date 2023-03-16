@@ -16,29 +16,28 @@ import cn.navyd.annotation.leetcode.Submission;
 
 /**
  * <pre>
-Find the kth largest element in an unsorted array. Note that it is the kth largest element in the sorted order, not the kth distinct element.
-
-Example 1:
-
-Input: [3,2,1,5,6,4] and k = 2
-Output: 5
-Example 2:
-
-Input: [3,2,3,1,2,4,5,5,6] and k = 4
-Output: 4
-Note: 
-You may assume k is always valid, 1 ≤ k ≤ array's length.
- * </pre>
- * 
- * @author navyd
+ * Find the kth largest element in an unsorted array. Note that it is the kth largest element in the sorted order, not the kth distinct element.
  *
+ * Example 1:
+ *
+ * Input: [3,2,1,5,6,4] and k = 2
+ * Output: 5
+ * Example 2:
+ *
+ * Input: [3,2,3,1,2,4,5,5,6] and k = 4
+ * Output: 4
+ * Note:
+ * You may assume k is always valid, 1 ≤ k ≤ array's length.
+ * </pre>
+ *
+ * @author navyd
  */
 @Problem(number = 215, difficulty = Difficulty.MEDIUM, tags = Tag.HEAP,
     url = "https://leetcode.com/problems/kth-largest-element-in-an-array/")
 public interface KthLargestElementinanArray {
   /**
    * 从未排序的数组中找出第k大（不去重）的元素
-   * 
+   *
    * @param nums
    * @param k
    * @return
@@ -62,7 +61,7 @@ public interface KthLargestElementinanArray {
       return nums[index];
     }
   }
-  
+
   @Author(name = "jmnarloch", significant = true,
       referenceUrls = "https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/60294/Solution-explained")
   @Submission(date = "2019-05-08", runtime = 6, runtimeBeatRate = 63.22, memory = 36.9,
@@ -78,17 +77,18 @@ public interface KthLargestElementinanArray {
     @Override
     public int findKthLargest(int[] nums, int k) {
       // 避免频繁扩容操作
-      Queue<Integer> queue = new PriorityQueue<>(k+1);
+      Queue<Integer> queue = new PriorityQueue<>(k + 1);
       for (int num : nums) {
         queue.offer(num);
         // 保证k个元素
-        if (queue.size() > k)
+        if (queue.size() > k) {
           queue.poll();
+        }
       }
       return queue.peek();
     }
   }
-  
+
   @Author(name = "jmnarloch", significant = true,
       referenceUrls = "https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/60294/Solution-explained")
   @Submission(date = "2019-05-08", runtime = 5, runtimeBeatRate = 67.82, memory = 36.1,
@@ -103,52 +103,58 @@ public interface KthLargestElementinanArray {
     @Override
     public int findKthLargest(int[] nums, int k) {
       shuffle(nums);
-      int lo = 0, hi = nums.length-1;
+      int lo = 0, hi = nums.length - 1;
       // 将第k大 转化为 数组下标k
       k = nums.length - k;
       while (lo < hi) {
         int index = partition(nums, lo, hi);
-        if (index < k)
+        if (index < k) {
           lo = index + 1;
-        else if (index > k)
+        } else if (index > k) {
           hi = index - 1;
-        else 
+        } else {
           break;
+        }
       }
       return nums[k];
     }
-    
+
     static final Random RAND = new Random();
-    
+
     void shuffle(int[] nums) {
-      for (int i = 0; i < nums.length; i++)
+      for (int i = 0; i < nums.length; i++) {
         swap(nums, i, RAND.nextInt(nums.length));
+      }
     }
-     
+
     int partition(int[] nums, int lo, int hi) {
       final int pivot = nums[lo];
-      int i = lo, j = hi+1;
+      int i = lo, j = hi + 1;
       while (true) {
-        while (nums[++i] <= pivot)
-          if (i == hi)
+        while (nums[++i] <= pivot) {
+          if (i == hi) {
             break;
-        while (nums[--j] > pivot)
+          }
+        }
+        while (nums[--j] > pivot) {
           ;
-        if (i >= j)
+        }
+        if (i >= j) {
           break;
+        }
         swap(nums, i, j);
       }
       swap(nums, lo, j);
       return j;
     }
-    
+
     static void swap(int[] nums, int i, int j) {
       int tmp = nums[i];
       nums[i] = nums[j];
       nums[j] = tmp;
     }
   }
-  
+
   @Optimal
   @Author(name = "cdai",
       referenceUrls = "https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/60312/AC-Clean-QuickSelect-Java-solution-avg.-O(n)-time/61582")
@@ -169,8 +175,9 @@ public interface KthLargestElementinanArray {
       final int pivot = nums[hi];
       int i = lo;
       for (int j = lo; j < hi; j++) {
-        if (nums[j] <= pivot)
+        if (nums[j] <= pivot) {
           swap(nums, i++, j);
+        }
       }
       swap(nums, i, hi);
       return i;

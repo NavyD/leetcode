@@ -12,21 +12,22 @@ import cn.navyd.annotation.leetcode.Problem;
 import cn.navyd.annotation.leetcode.Submission;
 
 /**
-<pre>
-Given an array of citations (each citation is a non-negative integer) of a researcher, write a function to compute the researcher's h-index.
-
-According to the definition of h-index on Wikipedia: "A scientist has index h if h of his/her N papers have at least h citations each, and the other N − h papers have no more than h citations each."
-
-Example:
-
-Input: citations = [3,0,6,1,5]
-Output: 3 
-Explanation: [3,0,6,1,5] means the researcher has 5 papers in total and each of them had 
-             received 3, 0, 6, 1, 5 citations respectively. 
-             Since the researcher has 3 papers with at least 3 citations each and the remaining 
-             two with no more than 3 citations each, her h-index is 3.
-Note: If there are several possible values for h, the maximum one is taken as the h-index.
-</pre>
+ * <pre>
+ * Given an array of citations (each citation is a non-negative integer) of a researcher, write a function to compute the researcher's h-index.
+ *
+ * According to the definition of h-index on Wikipedia: "A scientist has index h if h of his/her N papers have at least h citations each, and the other N − h papers have no more than h citations each."
+ *
+ * Example:
+ *
+ * Input: citations = [3,0,6,1,5]
+ * Output: 3
+ * Explanation: [3,0,6,1,5] means the researcher has 5 papers in total and each of them had
+ * received 3, 0, 6, 1, 5 citations respectively.
+ * Since the researcher has 3 papers with at least 3 citations each and the remaining
+ * two with no more than 3 citations each, her h-index is 3.
+ * Note: If there are several possible values for h, the maximum one is taken as the h-index.
+ * </pre>
+ *
  * @author navyd
  * ps: 这个题目有点难懂,h-index的定义有点混乱
  */
@@ -35,10 +36,11 @@ public interface HIndex {
   /**
    * h-index被定义为第一个 被引用的次数h >= 被引用论文的数量之和。
    * 也就是说 {@code h<=citations.length}
+   *
    * @param citations
    * @return
    */
-  public int hIndex(int[] citations);   
+  public int hIndex(int[] citations);
 
   @Author(value = "力扣 (LeetCode)", references = "https://leetcode-cn.com/problems/h-index/solution/hzhi-shu-by-leetcode/")
   @Author("navyd")
@@ -65,17 +67,20 @@ public interface HIndex {
     public int hIndex(int[] citations) {
       final int n = citations.length;
       // 0. create counts with citation index
-      int[] counts = new int[n+1];
+      int[] counts = new int[n + 1];
       for (int c : citations)
-        // count as n if over n, because of "other N − h papers"
+      // count as n if over n, because of "other N − h papers"
+      {
         counts[(c > n ? n : c)]++;
+      }
       int papers = 0;
       // 1. iterative h from n--
       for (int h = n; h >= 0; h--) {
         papers += counts[h];
         // 2. check papers and h index
-        if (papers >= h)
+        if (papers >= h) {
           return h;
+        }
       }
       return 0;
     }
@@ -94,7 +99,9 @@ public interface HIndex {
       Arrays.sort(citations);
       final int n = citations.length;
       int h = 0;
-      while (h < n && citations[n-1-h] > h) h++;
+      while (h < n && citations[n - 1 - h] > h) {
+        h++;
+      }
       return h;
     }
 
@@ -104,20 +111,16 @@ public interface HIndex {
 
   public static void main(String[] args) {
     HIndex p = new Solution();
-    int[] citations = {3,0,6,1,5};
+    int[] citations = {3, 0, 6, 1, 5};
     System.out.println(p.hIndex(citations));
   }
 
 
-
-
-
-  
   @Author(value = "han35", references = "https://leetcode.com/problems/h-index/discuss/70808/Simple-Java-solution-with-sort/73010")
-  @Author(value = "novice00",  references = "https://leetcode.com/problems/h-index/discuss/70808/Simple-Java-solution-with-sort")
-  @Submission(submittedDate = @DateTime("20190515"),  
-  runtime = 1, runtimeBeatRate = 81.61, memory = 34.5, memoryBeatRate = 99.67,
-  url = "https://leetcode.com/submissions/detail/228978719/")
+  @Author(value = "novice00", references = "https://leetcode.com/problems/h-index/discuss/70808/Simple-Java-solution-with-sort")
+  @Submission(submittedDate = @DateTime("20190515"),
+      runtime = 1, runtimeBeatRate = 81.61, memory = 34.5, memoryBeatRate = 99.67,
+      url = "https://leetcode.com/submissions/detail/228978719/")
   public static class SolutionBySort implements HIndex {
 
     /**
@@ -134,19 +137,20 @@ public interface HIndex {
       int paperCount = n;
       for (int i = 0; i < n; i++) {
         // 如果第一个citation >= count表示以后的citation都>count 该count是最大的
-        if (paperCount <= citations[i])
+        if (paperCount <= citations[i]) {
           break;
+        }
         // 该count不符合citation
         paperCount--;
       }
       return paperCount;
     }
   }
-  
+
   @Author(value = "oreomilkshake", references = "https://leetcode.com/problems/h-index/discuss/70808/Simple-Java-solution-with-sort/73008")
-  @Submission(submittedDate = @DateTime("20190515"),  
-  runtime = 1, runtimeBeatRate = 81.61, memory = 35.1, memoryBeatRate = 98.91,
-  url = "https://leetcode.com/submissions/detail/228970601/")
+  @Submission(submittedDate = @DateTime("20190515"),
+      runtime = 1, runtimeBeatRate = 81.61, memory = 35.1, memoryBeatRate = 98.91,
+      url = "https://leetcode.com/submissions/detail/228970601/")
   public static class SolutionBySortEndToStart implements HIndex {
 
     /**
@@ -161,13 +165,14 @@ public interface HIndex {
       int paperCount = 0;
       for (int i = n - 1; i >= 0; i--) {
         // 引用数量大于论文数量
-        if (paperCount < citations[i]) 
+        if (paperCount < citations[i]) {
           paperCount++;
-        else 
+        } else {
           break;
+        }
       }
       return paperCount;
     }
-    
+
   }
 }

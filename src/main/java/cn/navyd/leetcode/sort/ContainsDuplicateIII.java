@@ -15,27 +15,28 @@ import cn.navyd.annotation.leetcode.Submission;
 
 /**
  * <pre>
-Given an array of integers, find out whether there are two distinct indices i and j in the array such that the absolute difference between nums[i] and nums[j] is at most t and the absolute difference between i and j is at most k.
-
-Example 1:
-
-Input: nums = [1,2,3,1], k = 3, t = 0
-Output: true
-Example 2:
-
-Input: nums = [1,0,1,1], k = 1, t = 2
-Output: true
-Example 3:
-
-Input: nums = [1,5,9,1,5,9], k = 2, t = 3
-Output: false
-</pre>
+ * Given an array of integers, find out whether there are two distinct indices i and j in the array such that the absolute difference between nums[i] and nums[j] is at most t and the absolute difference between i and j is at most k.
+ *
+ * Example 1:
+ *
+ * Input: nums = [1,2,3,1], k = 3, t = 0
+ * Output: true
+ * Example 2:
+ *
+ * Input: nums = [1,0,1,1], k = 1, t = 2
+ * Output: true
+ * Example 3:
+ *
+ * Input: nums = [1,5,9,1,5,9], k = 2, t = 3
+ * Output: false
+ * </pre>
  */
 @Problem(number = 220, difficulty = DifficultyEnum.MEDIUM)
 public interface ContainsDuplicateIII {
   /**
    * 要求nums两个下标i,j的绝对值在k范围内对应的nums[i], nums[j]的绝对值在t范围内
    * <p>k表示两个下标的间隔。如k=1需要使用两个相邻元素比较，k=2需要在三个相邻元素间比较该范围内的num的绝对差值是否在<=t范围内
+   *
    * @param nums
    * @param k
    * @param t
@@ -65,8 +66,9 @@ public interface ContainsDuplicateIII {
      */
     @Override
     public boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
-      if (k <= 0 || t < 0)
+      if (k <= 0 || t < 0) {
         return false;
+      }
       // 0. create hash map for k window
       final Map<Long, Long> buckets = new HashMap<>(k);
       // be careful of int overflow
@@ -75,17 +77,21 @@ public interface ContainsDuplicateIII {
         // 1. get bucket with num and t
         final long bucket = getBucket(nums[i], range);
         // 3. check bucket existed or adjacent bucket
-        if (buckets.containsKey(bucket))
+        if (buckets.containsKey(bucket)) {
           return true;
-        if (buckets.containsKey(bucket - 1) && Math.abs(nums[i] - buckets.get(bucket - 1)) <= t)
+        }
+        if (buckets.containsKey(bucket - 1) && Math.abs(nums[i] - buckets.get(bucket - 1)) <= t) {
           return true;
-        if (buckets.containsKey(bucket + 1) && Math.abs(buckets.get(bucket + 1) - nums[i]) <= t)
+        }
+        if (buckets.containsKey(bucket + 1) && Math.abs(buckets.get(bucket + 1) - nums[i]) <= t) {
           return true;
+        }
         // 2. put bucket
-        buckets.put(bucket, (long)nums[i]);
+        buckets.put(bucket, (long) nums[i]);
         // remove last bucket if window > k
-        if (buckets.size() > k)
-          buckets.remove(getBucket(nums[i-k], range));
+        if (buckets.size() > k) {
+          buckets.remove(getBucket(nums[i - k], range));
+        }
       }
       return false;
     }
@@ -111,24 +117,28 @@ public interface ContainsDuplicateIII {
      */
     @Override
     public boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
-      if (k < 1 || t < 0 || nums.length == 0)
+      if (k < 1 || t < 0 || nums.length == 0) {
         return false;
+      }
       // 1. create bst
       final java.util.NavigableSet<Long> set = new TreeSet<>();
       for (int i = 0; i < nums.length; i++) {
         final long num = nums[i];
         final Long floorNum = set.floor(num);
         // 2. check equal or floor num and t difference
-        if (floorNum != null && num - floorNum <= t)
+        if (floorNum != null && num - floorNum <= t) {
           return true;
+        }
         final Long ceilingNum = set.ceiling(num);
         // 3. check equal ceiling num and t difference
-        if (ceilingNum != null && ceilingNum - num <= t)
+        if (ceilingNum != null && ceilingNum - num <= t) {
           return true;
+        }
         set.add(num);
         // 4. window elements is k+1, set must is k size
-        if (set.size() > k)
-          set.remove((long)nums[i-k]);
+        if (set.size() > k) {
+          set.remove((long) nums[i - k]);
+        }
       }
       return false;
     }
@@ -145,14 +155,15 @@ public interface ContainsDuplicateIII {
     @Override
     public boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
       for (int i = 0; i < nums.length; i++) {
-        final int limit = i+k;
-        for (int next = i+1; next <= limit && next < nums.length; next++) {
+        final int limit = i + k;
+        for (int next = i + 1; next <= limit && next < nums.length; next++) {
           long val = nums[i], nextVal = nums[next];
           // 可能导致int溢出
           long abs = Math.abs(val - nextVal);
           // 比较绝对值 <= t则返回true
-          if (abs <= t)
+          if (abs <= t) {
             return true;
+          }
         }
       }
       return false;
@@ -165,40 +176,43 @@ public interface ContainsDuplicateIII {
      * 思路：sliding window 暴力破解
      * <p>错误答案：官方所有用例可以通过，但下面的测试无法通过。
      * <p>原因：当t==0时end=end的做法将跳过start-end中间元素不比较
-     * 
+     *
      * <pre>
-[8,1,1,6,7,5,9]
-3
-0
+     * [8,1,1,6,7,5,9]
+     * 3
+     * 0
      * </pre>
      * 解决方案：取消t==0做法正常比较，但是时间复杂度是O(N^2)
      */
     @Override
     public boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
-      if (k < 1 || t < 0 || nums.length <= 1)
+      if (k < 1 || t < 0 || nums.length <= 1) {
         return false;
+      }
       int start = 0, end = 1;
       final int n = nums.length, endIndex = n - 1;
       // out loop 
       while (start < endIndex) {
         // compare
-        if (Math.abs((long)nums[start]-nums[end]) <= t)
+        if (Math.abs((long) nums[start] - nums[end]) <= t) {
           return true;
+        }
         // out of k window or to end index
         if ((end - start) >= k || end >= endIndex) {
           start++;
-          end = t != 0 ? start+1 : end;
+          end = t != 0 ? start + 1 : end;
         }
         // [start,end] in k range
-        else
+        else {
           end++;
+        }
       }
       return false;
     }
   }
 
   public static void main(String[] args) {
-    int[] nums = {8,1,1,6,7,5,9};
+    int[] nums = {8, 1, 1, 6, 7, 5, 9};
     int k = 3, t = 0;
     ContainsDuplicateIII p = new ErrorSolutionBySlidingWindow();
     System.out.println(p.containsNearbyAlmostDuplicate(nums, k, t));

@@ -14,20 +14,19 @@ import cn.navyd.annotation.leetcode.Unskilled;
 
 /**
  * <pre>
-Sort a linked list in O(n log n) time using constant space complexity.
-
-Example 1:
-
-Input: 4->2->1->3
-Output: 1->2->3->4
-Example 2:
-
-Input: -1->5->3->4->0
-Output: -1->0->3->4->5
- * </pre>
- * 
- * @author navyd
+ * Sort a linked list in O(n log n) time using constant space complexity.
  *
+ * Example 1:
+ *
+ * Input: 4->2->1->3
+ * Output: 1->2->3->4
+ * Example 2:
+ *
+ * Input: -1->5->3->4->0
+ * Output: -1->0->3->4->5
+ * </pre>
+ *
+ * @author navyd
  */
 @Unskilled
 @Problem(number = 148, difficulty = Difficulty.MEDIUM, tags = {Tag.SORT, Tag.LINKED_LIST},
@@ -45,7 +44,7 @@ public interface SortList {
   public ListNode sortList(ListNode head);
 
   @Optimal
-  @Author(name = "qinlei515", 
+  @Author(name = "qinlei515",
       referenceUrls = "https://leetcode.com/problems/sort-list/discuss/46712/Bottom-to-up(not-recurring)-with-o(1)-space-complextity-and-o(nlgn)-time-complextity/151523")
   @Author(name = "zdwu", significant = true,
       referenceUrls = "https://leetcode.com/problems/sort-list/discuss/46712/Bottom-to-up(not-recurring)-with-o(1)-space-complextity-and-o(nlgn)-time-complextity")
@@ -78,8 +77,9 @@ public interface SortList {
      */
     @Override
     public ListNode sortList(ListNode head) {
-      if (head == null || head.next == null)
+      if (head == null || head.next == null) {
         return head;
+      }
       // 保存有序链表
       final ListNode dummy = new ListNode(0);
       dummy.next = head;
@@ -100,10 +100,10 @@ public interface SortList {
           tail = merge(left, right, tail);
         }
       }
-      
+
       return dummy.next;
     }
-    
+
     static int getLength(ListNode node) {
       int count = 0;
       while (node != null) {
@@ -112,30 +112,33 @@ public interface SortList {
       }
       return count;
     }
-    
+
     /**
      * 将node分离为两个链表，left最多可能由size个节点，right从第size+1个开始到最后。
      * <p>返回right节点。如果left少于size个节点，则返回null表示right不存在
+     *
      * @param node
      * @param size
      * @return
      */
     static ListNode split(ListNode node, int size) {
       // 如果size=1，则node不变
-      while (node != null && --size > 0)
+      while (node != null && --size > 0) {
         node = node.next;
+      }
       // 不足size个
-      if (node == null)
+      if (node == null) {
         return null;
+      }
       ListNode next = node.next;
       node.next = null;
       return next;
     }
-    
+
     /**
-     * 
      * 将left与right排序合并到已排序的tail上，并返回tail的最后一个节点tail
      * <p>直接将排序的合并到tail节点后面
+     *
      * @param left
      * @param right
      * @param tail
@@ -150,7 +153,7 @@ public interface SortList {
           // 不需要额外操作，如:left.next = null, cur.next虽然链接后面的left，但是会被之后的合并覆盖
           cur.next = left;
           left = left.next;
-        } 
+        }
         // 合并right
         else {
           cur.next = right;
@@ -161,16 +164,17 @@ public interface SortList {
       // 合并多出的节点
       cur.next = left != null ? left : right;
       // 迭代到最后返回有序链表的最后节点
-      while (cur.next != null)
+      while (cur.next != null) {
         cur = cur.next;
+      }
       return cur;
     }
   }
-  
-  @Author(name = "jeantimex", significant = true, 
+
+  @Author(name = "jeantimex", significant = true,
       referenceUrls = "https://leetcode.com/problems/sort-list/discuss/46714/Java-merge-sort-solution")
   @Submission(date = "2019-05-22", runtime = 3, runtimeBeatRate = 97.35, memory = 38.8, memoryBeatRate = 99.51,
-    url = "https://leetcode.com/submissions/detail/230520224/")
+      url = "https://leetcode.com/submissions/detail/230520224/")
   @Submission(date = "2019-03-27", runtime = 3, runtimeBeatRate = 97.35, memory = 40.7, memoryBeatRate = 77.82,
       url = "https://leetcode.com/submissions/detail/218038080/")
   @Solution(timeComplexity = Complexity.O_N_LOG_N, spaceComplexity = Complexity.O_LOG_N)
@@ -192,8 +196,9 @@ public interface SortList {
      */
     @Override
     public ListNode sortList(ListNode head) {
-      if (head == null || head.next == null)
+      if (head == null || head.next == null) {
         return head;
+      }
       // 分离链表
       ListNode prev = null, slow = head, fast = head;
       // 找到mid节点
@@ -205,14 +210,15 @@ public interface SortList {
       // 分离mid前后子链表
       prev.next = null;
       // 切分链表为单节点
-      ListNode left = sortList(head), 
+      ListNode left = sortList(head),
           right = sortList(slow);
       // 合并链表
       return merge(left, right);
     }
-    
+
     /**
      * 归并两个链表并返回有序的新链表
+     *
      * @param left
      * @param right
      * @return
@@ -253,21 +259,24 @@ public interface SortList {
       int[] vals = new int[length];
       int i = 0;
       // 赋值到数组
-      for (ListNode node = head; node != null; node = node.next)
+      for (ListNode node = head; node != null; node = node.next) {
         vals[i++] = node.val;
+      }
       // 排序 快速排序
       Arrays.sort(vals);
       // 修改链表
       i = 0;
-      for (ListNode node = head; node != null; node = node.next)
+      for (ListNode node = head; node != null; node = node.next) {
         node.val = vals[i++];
+      }
       return head;
     }
-    
+
     static int getLength(ListNode head) {
       int length = 0;
-      for (ListNode node = head; node != null; node = node.next)
+      for (ListNode node = head; node != null; node = node.next) {
         length++;
+      }
       return length;
     }
   }

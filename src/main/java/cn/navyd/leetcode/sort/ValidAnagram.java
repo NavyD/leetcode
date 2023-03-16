@@ -15,25 +15,24 @@ import cn.navyd.annotation.leetcode.Submission;
 
 /**
  * <pre>
-Given two strings s and t , write a function to determine if t is an anagram of s.
-
-Example 1:
-
-Input: s = "anagram", t = "nagaram"
-Output: true
-Example 2:
-
-Input: s = "rat", t = "car"
-Output: false
-Note:
-You may assume the string contains only lowercase alphabets.
-
-Follow up:
-What if the inputs contain unicode characters? How would you adapt your solution to such case?
- * </pre>
- * 
- * @author navyd
+ * Given two strings s and t , write a function to determine if t is an anagram of s.
  *
+ * Example 1:
+ *
+ * Input: s = "anagram", t = "nagaram"
+ * Output: true
+ * Example 2:
+ *
+ * Input: s = "rat", t = "car"
+ * Output: false
+ * Note:
+ * You may assume the string contains only lowercase alphabets.
+ *
+ * Follow up:
+ * What if the inputs contain unicode characters? How would you adapt your solution to such case?
+ * </pre>
+ *
+ * @author navyd
  */
 @Problem(difficulty = DifficultyEnum.EASY, number = 242)
 public interface ValidAnagram {
@@ -48,6 +47,7 @@ public interface ValidAnagram {
    * <li>full sort O(n log n)：排序后比较index对应一致
    * <li>half sort O(N)：排序中比较index一致。多线程可以实现这个分布式算法
    * </ul>
+   *
    * @param s
    * @param t
    * @return
@@ -58,7 +58,7 @@ public interface ValidAnagram {
   @Submission(memory = 37.3, memoryBeatRate = 94.84, runtime = 2, runtimeBeatRate = 99.72, submittedDate = @DateTime("20191130"), url = "https://leetcode.com/submissions/detail/282654435/")
   @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N), spaceComplexity = ComplexityEnum.O_1, inplace = false)
   public static class SolutionByCount implements ValidAnagram {
-    
+
     /**
      * 思路：计数。使用特别的条件s,t都是lowercase alphabets.即是26个字符
      * <p>复杂度:设s,t的元素为N
@@ -68,19 +68,24 @@ public interface ValidAnagram {
      */
     @Override
     public boolean isAnagram(String s, String t) {
-      if (s.length() != t.length())
+      if (s.length() != t.length()) {
         return false;
+      }
       final char offset = 'a';
       // 0. counter for 26 lantin
       final int[] counts = new int[26];
       // 1. traverse and count for s
-      for (char c : s.toCharArray())
-        counts[c-offset]++;
+      for (char c : s.toCharArray()) {
+        counts[c - offset]++;
+      }
       // 2. traverse and de-count for t
       for (char c : t.toCharArray())
-        // 3. check counter is 0
-        if (--counts[c-offset] < 0)
+      // 3. check counter is 0
+      {
+        if (--counts[c - offset] < 0) {
           return false;
+        }
+      }
       return true;
     }
   }
@@ -94,18 +99,21 @@ public interface ValidAnagram {
      */
     @Override
     public boolean isAnagram(String s, String t) {
-      if (s.length() != t.length())
+      if (s.length() != t.length()) {
         return false;
+      }
       // 0. count for s
       final Map<Character, Integer> counts = new HashMap<>(s.length());
-      for (Character c : s.toCharArray())
-        counts.put(c, counts.getOrDefault(c, 0)+1);
+      for (Character c : s.toCharArray()) {
+        counts.put(c, counts.getOrDefault(c, 0) + 1);
+      }
       // 1. de-count for t
       for (Character c : t.toCharArray()) {
         Integer count = counts.get(c);
         // 2. check count is 0
-        if (count == null || counts.put(c, count-1) <= 0)
+        if (count == null || counts.put(c, count - 1) <= 0) {
           return false;
+        }
       }
       return true;
     }
@@ -120,17 +128,20 @@ public interface ValidAnagram {
      */
     @Override
     public boolean isAnagram(String s, String t) {
-      if (s.length() != t.length())
+      if (s.length() != t.length()) {
         return false;
+      }
       // 0. sort
       final char[] sa = s.toCharArray(),
-        ta = t.toCharArray();
+          ta = t.toCharArray();
       Arrays.sort(sa);
       Arrays.sort(ta);
       // 1. compare to index
-      for (int i = 0; i < s.length(); i++)
-        if (sa[i] != ta[i])
+      for (int i = 0; i < s.length(); i++) {
+        if (sa[i] != ta[i]) {
           return false;
+        }
+      }
       return true;
     }
   }

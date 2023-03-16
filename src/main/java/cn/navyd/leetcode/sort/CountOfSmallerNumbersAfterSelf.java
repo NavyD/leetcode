@@ -17,21 +17,20 @@ import cn.navyd.annotation.leetcode.Submission;
 
 /**
  * <pre>
-You are given an integer array nums and you have to return a new counts array. The counts array has the property where counts[i] is the number of smaller elements to the right of nums[i].
-
-Example:
-
-Input: [5,2,6,1]
-Output: [2,1,1,0] 
-Explanation:
-To the right of 5 there are 2 smaller elements (2 and 1).
-To the right of 2 there is only 1 smaller element (1).
-To the right of 6 there is 1 smaller element (1).
-To the right of 1 there is 0 smaller element.
- * </pre>
- * 
- * @author navyd
+ * You are given an integer array nums and you have to return a new counts array. The counts array has the property where counts[i] is the number of smaller elements to the right of nums[i].
  *
+ * Example:
+ *
+ * Input: [5,2,6,1]
+ * Output: [2,1,1,0]
+ * Explanation:
+ * To the right of 5 there are 2 smaller elements (2 and 1).
+ * To the right of 2 there is only 1 smaller element (1).
+ * To the right of 6 there is 1 smaller element (1).
+ * To the right of 1 there is 0 smaller element.
+ * </pre>
+ *
+ * @author navyd
  */
 @Problem(number = 315, difficulty = DifficultyEnum.HARD, url = "https://leetcode.com/problems/count-of-smaller-numbers-after-self/")
 public interface CountOfSmallerNumbersAfterSelf {
@@ -60,23 +59,27 @@ public interface CountOfSmallerNumbersAfterSelf {
      */
     @Override
     public List<Integer> countSmaller(int[] nums) {
-      if (nums == null || nums.length == 0)
+      if (nums == null || nums.length == 0) {
         return Collections.emptyList();
-      if (nums.length == 1)
+      }
+      if (nums.length == 1) {
         return Arrays.asList(0);
+      }
       // 初始化 构造counts indexes数组
-      final int[] 
-          indexes = new int[nums.length], 
+      final int[]
+          indexes = new int[nums.length],
           counts = new int[nums.length];
-      for (int i = 0; i < nums.length; i++)
+      for (int i = 0; i < nums.length; i++) {
         indexes[i] = i;
-      
+      }
+
       // 归并排序 生成counts
       mergeSort(nums, indexes, 0, nums.length - 1, counts);
       // 结果
       List<Integer> result = new ArrayList<>(nums.length);
-      for (int count : counts)
+      for (int count : counts) {
         result.add(count);
+      }
       return result;
     }
 
@@ -84,8 +87,9 @@ public interface CountOfSmallerNumbersAfterSelf {
      * 归并排序。将nums排序使的indexes在nums的下标有序
      */
     private void mergeSort(int[] nums, int[] indexes, int start, int end, int[] counts) {
-      if (start >= end)
+      if (start >= end) {
         return;
+      }
       int mid = (start + end) / 2;
       mergeSort(nums, indexes, start, mid, counts);
       mergeSort(nums, indexes, mid + 1, end, counts);
@@ -128,8 +132,9 @@ public interface CountOfSmallerNumbersAfterSelf {
         newIndexes[k++] = indexes[j++];
       }
       // 保存排序下标
-      for (int h = start; h <= end; h++)
+      for (int h = start; h <= end; h++) {
         indexes[h] = newIndexes[h - start];
+      }
     }
   }
 
@@ -152,12 +157,12 @@ public interface CountOfSmallerNumbersAfterSelf {
      * => loop0:left 5 > right 2                                      idx_l=0 idx_r=0
      * =>       count=1 temp_arr:[2, null]
      * => loop1:counts[0](5)+=count = 1 temp_arr:[2, 5]               idx_l=0 idx_r=1
-     * 
+     *
      * =>         6 | 1
      * => loop0:left 6 > right 1                                      idx_l=0 idx_r=0
      * =>       count=1 temp_arr:[1, null]
      * => loop1: counts[2](6)+=count = 1 temp_arr:[1, 6]              idx_l=0 idx_r=1
-     * 
+     *
      * =>         2,5 | 1,6
      * => loop0:left 2 > right 1                                      idx_l=0 idx_r=0
      * =>       count=1 temp_arr:[1,null,null,null]
@@ -176,26 +181,31 @@ public interface CountOfSmallerNumbersAfterSelf {
     public List<Integer> countSmaller(int[] nums) {
       final int n = nums.length;
       List<Integer> res = new ArrayList<>(n);
-      if (n == 0)
+      if (n == 0) {
         return res;
+      }
       if (n == 1) {
         res.add(0);
         return res;
       }
       // counts indexes
       final int[] counts = new int[n], indexes = new int[n], auxIndexes = new int[n];
-      for (int i = 0; i < n; i++)
+      for (int i = 0; i < n; i++) {
         indexes[i] = i;
+      }
       mergeSort(nums, counts, indexes, auxIndexes, 0, n - 1);
-      for (int c : counts)
+      for (int c : counts) {
         res.add(c);
+      }
       return res;
     }
 
-    static void mergeSort(int[] nums, int[] counts, int[] indexes, int[] auxIndexes, int lo, int hi) {
+    static void mergeSort(int[] nums, int[] counts, int[] indexes, int[] auxIndexes, int lo,
+                          int hi) {
       // recursion terminated
-      if (lo >= hi)
+      if (lo >= hi) {
         return;
+      }
       // left
       int mid = lo + (hi - lo) / 2;
       mergeSort(nums, counts, indexes, auxIndexes, lo, mid);
@@ -205,9 +215,11 @@ public interface CountOfSmallerNumbersAfterSelf {
       mergeWithIdx(nums, counts, indexes, auxIndexes, lo, mid, hi);
     }
 
-    static void mergeWithCount(int[] nums, int[] counts, int[] indexes, int[] auxIndexes, int lo, int mid, int hi) {
-      for (int i = lo; i <= hi; i++)
+    static void mergeWithCount(int[] nums, int[] counts, int[] indexes, int[] auxIndexes, int lo,
+                               int mid, int hi) {
+      for (int i = lo; i <= hi; i++) {
         auxIndexes[i] = indexes[i];
+      }
       // compares left and right
       int left = lo, right = mid + 1, i = lo;
       int count = 0;
@@ -224,8 +236,9 @@ public interface CountOfSmallerNumbersAfterSelf {
         }
       }
       // rest of the right
-      while (right <= hi)
+      while (right <= hi) {
         indexes[i++] = auxIndexes[right++];
+      }
       // rest of the left
       while (left <= mid) {
         counts[auxIndexes[left]] += count;
@@ -233,9 +246,11 @@ public interface CountOfSmallerNumbersAfterSelf {
       }
     }
 
-    static void mergeWithIdx(int[] nums, int[] counts, int[] indexes, int[] auxIndexes, int lo, int mid, int hi) {
-      for (int i = lo; i <= hi; i++)
+    static void mergeWithIdx(int[] nums, int[] counts, int[] indexes, int[] auxIndexes, int lo,
+                             int mid, int hi) {
+      for (int i = lo; i <= hi; i++) {
         auxIndexes[i] = indexes[i];
+      }
       // compares left and right
       int left = lo, right = mid + 1, i = lo;
       while (left <= mid && right <= hi) {
@@ -250,8 +265,9 @@ public interface CountOfSmallerNumbersAfterSelf {
         }
       }
       // rest of the right
-      while (right <= hi)
+      while (right <= hi) {
         indexes[i++] = auxIndexes[right++];
+      }
       // rest of the left
       while (left <= mid) {
         counts[auxIndexes[left]] += right - (mid + 1);
@@ -266,30 +282,30 @@ public interface CountOfSmallerNumbersAfterSelf {
     /**
      * 思路：使用FenwickTree树状数组计算每个元素的前缀和。
      * <p>FenwickTree如何计算nums数小的数量？
-     * 
+     * <p>
      * 由于tree的特殊性，让nums放在tree中可以快速计算指定元素前的所有元素之和。只要
      * 将nums从后往前入tree，就可以得到当前元素右边小的元素之和。
-     * 
+     * <p>
      * tree不能存储nums的值，因为要求的是数量个数。考虑到nums可能有重复值出现，
      * 而题意只要求小的数，那么重复的数就不应该占多余空间，直接存储nums的下标是会
      * 浪费空间的。tree应该存储的是去重后的set的下标与出现的次数。
-     * 
+     *
      * <p>set与次数在tree如何工作？
-     * 
+     * <p>
      * 当从后往前nums时，将set下标rank和次数1更新到tree中，然后找比当前num小的数rank-1
      * 以前的所有和（出现次数）。如果nums遇到相同的num，set的下标rank是一样的，但更新到
      * tree时update rank,1使出现次数+1，可被统计到小于元素中
-     * 
+     *
      * <p>如何找到set与次数？
-     * 
+     * <p>
      * 用TreeSet去重和排序，再遍历set时可用map关联 num,rank。这个叫离散化，将元素的值
      * 用相对排名处理，只关心大小顺序
-     * 
+     * <p>
      * 在后面遍历nums构造tree时，可通过num与map查到出同次数
-     * 
+     *
      * <p>为何FenwickTree(set.size+1)？
      * 用的是set中的下标作为tree，由于tree数组0下标不用，则多加一个
-     * 
+     *
      * <p>时间复杂度：FenwickTree.update getsum是logN，即为O(NlogN)
      * <p>空间：O(N)
      */
@@ -297,8 +313,9 @@ public interface CountOfSmallerNumbersAfterSelf {
     public List<Integer> countSmaller(int[] nums) {
       Collections.shuffle(list);
       List<Integer> res = new ArrayList<>(nums.length);
-      if (nums.length == 0)
+      if (nums.length == 0) {
         return res;
+      }
       if (nums.length == 1) {
         res.add(0);
         return res;
@@ -319,7 +336,7 @@ public interface CountOfSmallerNumbersAfterSelf {
       for (int i = nums.length - 1; i >= 0; i--) {
         int rank = ranks.get(nums[i]);
         tree.update(rank, 1);
-        res.add(tree.getSum(rank-1));
+        res.add(tree.getSum(rank - 1));
       }
       Collections.reverse(res);
       return res;
@@ -351,12 +368,11 @@ public interface CountOfSmallerNumbersAfterSelf {
       }
 
       private int lowbit(int i) {
-        return i&(-i);
+        return i & (-i);
       }
     }
   }
 
-  
 
   public static void main(String[] args) {
     int[] a = {5, 2, 6, 1};

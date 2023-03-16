@@ -15,22 +15,22 @@ import cn.navyd.annotation.leetcode.Submission;
 
 /**
  * <pre>
-Given a collection of intervals, merge all overlapping intervals.
-
-Example 1:
-
-Input: [[1,3],[2,6],[8,10],[15,18]]
-Output: [[1,6],[8,10],[15,18]]
-Explanation: Since intervals [1,3] and [2,6] overlaps, merge them into [1,6].
-Example 2:
-
-Input: [[1,4],[4,5]]
-Output: [[1,5]]
-Explanation: Intervals [1,4] and [4,5] are considered overlapping.
-NOTE: input types have been changed on April 15, 2019. Please reset to default code definition to get new method signature.
- * </pre>
- * @author navyd
+ * Given a collection of intervals, merge all overlapping intervals.
  *
+ * Example 1:
+ *
+ * Input: [[1,3],[2,6],[8,10],[15,18]]
+ * Output: [[1,6],[8,10],[15,18]]
+ * Explanation: Since intervals [1,3] and [2,6] overlaps, merge them into [1,6].
+ * Example 2:
+ *
+ * Input: [[1,4],[4,5]]
+ * Output: [[1,5]]
+ * Explanation: Intervals [1,4] and [4,5] are considered overlapping.
+ * NOTE: input types have been changed on April 15, 2019. Please reset to default code definition to get new method signature.
+ * </pre>
+ *
+ * @author navyd
  */
 @Problem(number = 56, difficulty = DifficultyEnum.MEDIUM)
 public interface MergeIntervals {
@@ -40,11 +40,12 @@ public interface MergeIntervals {
    * <li>sort：保证interval.start有序出现
    * <li>merge to end：合并的区间移动到最后而不是前面不动，避免了跳过的问题
    * </ul>
+   *
    * @param intervals
    * @return
    */
   public int[][] merge(int[][] intervals);
-  
+
   @Author("navyd")
   @Submission(memory = 38.1, memoryBeatRate = 98.55, runtime = 6, runtimeBeatRate = 89.20, submittedDate = @DateTime("20191230"), url = "https://leetcode.com/submissions/detail/289604195/")
   @Author(value = "brubru777", references = "https://leetcode.com/problems/merge-intervals/discuss/21222/A-simple-Java-solution")
@@ -70,8 +71,9 @@ public interface MergeIntervals {
      */
     @Override
     public int[][] merge(int[][] intervals) {
-      if (intervals.length < 2)
+      if (intervals.length < 2) {
         return intervals;
+      }
       // 0. sort
       Arrays.sort(intervals, (a, b) -> a[0] - b[0]);
       int count = intervals.length;
@@ -86,14 +88,17 @@ public interface MergeIntervals {
           count--;
         }
         // 3. next is not overlap
-        else
+        else {
           curInterval = that;
+        }
       }
       // 4. get result
       int[][] res = new int[count][2];
-      for (int[] interval : intervals)
-        if (interval != null)
+      for (int[] interval : intervals) {
+        if (interval != null) {
           res[--count] = interval;
+        }
+      }
       return res;
     }
 
@@ -105,8 +110,9 @@ public interface MergeIntervals {
       int count = intervals.length;
       for (int i = 0; i < intervals.length; i++) {
         int[] interval = intervals[i];
-        if (interval == null)
+        if (interval == null) {
           continue;
+        }
         for (int j = i + 1; j < intervals.length; j++) {
           int[] that = intervals[j];
           if (interval[1] >= that[0]) {
@@ -120,13 +126,15 @@ public interface MergeIntervals {
       }
       // 2. merge if is overlap
       int[][] res = new int[count][2];
-      for (int[] interval : intervals)
-        if (interval != null)
+      for (int[] interval : intervals) {
+        if (interval != null) {
           res[--count] = interval;
+        }
+      }
       return res;
     }
   }
-  
+
   @Author(value = "vegito2002", references = "https://leetcode.com/problems/merge-intervals/discuss/21223/Beat-98-Java.-Sort-start-and-end-respectively./115420")
   @Author(value = "baselRus", references = "https://leetcode.com/problems/merge-intervals/discuss/21223/Beat-98-Java.-Sort-start-and-end-respectively./21227")
   @Author(value = "D_shaw", references = "https://leetcode.com/problems/merge-intervals/discuss/21223/Beat-98-Java.-Sort-start-and-end-respectively.")
@@ -156,12 +164,12 @@ public interface MergeIntervals {
      * <li>cur.end=5,next.start=8 ==> end >= start ==> 不重合区间start=8 合并之前重合区间[0,5]
      * <li>没有更多的next，合并之前不重合start=8, 最后的end=9。结果为[0,5],[8,9]
      * </ol>
-     * 
      */
     @Override
     public int[][] merge(int[][] intervals) {
-      if (intervals == null || intervals.length < 2)
+      if (intervals == null || intervals.length < 2) {
         return intervals;
+      }
       final int n = intervals.length;
       // 分别排序starts, ends
       final int[] starts = new int[n], ends = new int[n];
@@ -176,7 +184,7 @@ public interface MergeIntervals {
       // 表示重合区间的start
       int j = 0;
       for (int i = 1; i < n; i++) {
-        int curEnd = ends[i-1], nextStart = starts[i];
+        int curEnd = ends[i - 1], nextStart = starts[i];
         // 如果发现下一个区间与之前的不重合
         if (curEnd < nextStart) {
           // 合并之前重合的区间
@@ -187,10 +195,10 @@ public interface MergeIntervals {
         }
       }
       // 添加最后一个区间end与之前找到的重合区间下标j
-      mergedIntervals.add(new int[]{starts[j], ends[n-1]});
+      mergedIntervals.add(new int[] {starts[j], ends[n - 1]});
       return mergedIntervals.toArray(new int[0][]);
     }
-    
+
   }
 
   @Author(value = "0", references = "https://leetcode.com/submissions/api/detail/56/java/1/")
@@ -223,8 +231,9 @@ public interface MergeIntervals {
      */
     @Override
     public int[][] merge(int[][] intervals) {
-      if (intervals.length < 2)
+      if (intervals.length < 2) {
         return intervals;
+      }
       int count = intervals.length;
       // 0. duple iterative
       for (int i = 0; i < intervals.length; i++) {
@@ -232,8 +241,9 @@ public interface MergeIntervals {
         // break if once merged
         for (int nextIdx = i + 1; nextIdx < intervals.length; nextIdx++) {
           int[] next = intervals[nextIdx];
-          if (next == null || isDisjoint(cur, next))
+          if (next == null || isDisjoint(cur, next)) {
             continue;
+          }
           // 1. merge if is overlap
           next[0] = Math.min(cur[0], next[0]);
           next[1] = Math.max(cur[1], next[1]);
@@ -246,9 +256,11 @@ public interface MergeIntervals {
       }
       // 3. get result
       int[][] res = new int[count][];
-      for (int[] interval : intervals)
-        if (interval != null)
+      for (int[] interval : intervals) {
+        if (interval != null) {
           res[--count] = interval;
+        }
+      }
       return res;
     }
 
@@ -264,19 +276,22 @@ public interface MergeIntervals {
   public static class SolutionByIterativeMergeToEndOriginal implements MergeIntervals {
     @Override
     public int[][] merge(int[][] intervals) {
-      if (intervals.length < 2)
+      if (intervals.length < 2) {
         return intervals;
+      }
       int count = intervals.length;
       // 0. duplex iterative
       for (int i = 0; i < intervals.length; i++) {
         int[] cur = intervals[i];
-        if (cur == null)
+        if (cur == null) {
           continue;
+        }
         int curIdx = i;
         for (int nextIdx = i + 1; nextIdx < intervals.length; nextIdx++) {
           int[] next = intervals[nextIdx];
-          if (next == null)
+          if (next == null) {
             continue;
+          }
           // 1. merge if is overlap
           else if (isOverlap(cur, next)) {
             next[0] = Math.min(cur[0], next[0]);
@@ -291,9 +306,11 @@ public interface MergeIntervals {
       }
       // 3. get result
       int[][] res = new int[count][2];
-      for (int[] interval : intervals)
-        if (interval != null)
+      for (int[] interval : intervals) {
+        if (interval != null) {
           res[--count] = interval;
+        }
+      }
       return res;
     }
 
@@ -303,5 +320,5 @@ public interface MergeIntervals {
           // next include or intersect cur
           || (cur[0] > next[0] && (next[1] >= cur[1] || next[1] >= cur[0]));
     }
-}
+  }
 }

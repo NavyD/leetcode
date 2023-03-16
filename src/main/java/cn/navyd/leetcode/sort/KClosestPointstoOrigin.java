@@ -17,38 +17,38 @@ import cn.navyd.annotation.leetcode.Submission;
 
 /**
  * <pre>
-We have a list of points on the plane.  Find the K closest points to the origin (0, 0).
-
-(Here, the distance between two points on a plane is the Euclidean distance.)
-
-You may return the answer in any order.  The answer is guaranteed to be unique (except for the order that it is in.)
-
- 
-
-Example 1:
-
-Input: points = [[1,3],[-2,2]], K = 1
-Output: [[-2,2]]
-Explanation: 
-The distance between (1, 3) and the origin is sqrt(10).
-The distance between (-2, 2) and the origin is sqrt(8).
-Since sqrt(8) < sqrt(10), (-2, 2) is closer to the origin.
-We only want the closest K = 1 points from the origin, so the answer is just [[-2,2]].
-Example 2:
-
-Input: points = [[3,3],[5,-1],[-2,4]], K = 2
-Output: [[3,3],[-2,4]]
-(The answer [[-2,4],[3,3]] would also be accepted.)
- 
-
-Note:
-
-1 <= K <= points.length <= 10000
--10000 < points[i][0] < 10000
--10000 < points[i][1] < 10000
- * </pre>
- * @author navyd
+ * We have a list of points on the plane.  Find the K closest points to the origin (0, 0).
  *
+ * (Here, the distance between two points on a plane is the Euclidean distance.)
+ *
+ * You may return the answer in any order.  The answer is guaranteed to be unique (except for the order that it is in.)
+ *
+ *
+ *
+ * Example 1:
+ *
+ * Input: points = [[1,3],[-2,2]], K = 1
+ * Output: [[-2,2]]
+ * Explanation:
+ * The distance between (1, 3) and the origin is sqrt(10).
+ * The distance between (-2, 2) and the origin is sqrt(8).
+ * Since sqrt(8) < sqrt(10), (-2, 2) is closer to the origin.
+ * We only want the closest K = 1 points from the origin, so the answer is just [[-2,2]].
+ * Example 2:
+ *
+ * Input: points = [[3,3],[5,-1],[-2,4]], K = 2
+ * Output: [[3,3],[-2,4]]
+ * (The answer [[-2,4],[3,3]] would also be accepted.)
+ *
+ *
+ * Note:
+ *
+ * 1 <= K <= points.length <= 10000
+ * -10000 < points[i][0] < 10000
+ * -10000 < points[i][1] < 10000
+ * </pre>
+ *
+ * @author navyd
  */
 @Problem(difficulty = DifficultyEnum.MEDIUM, number = 973)
 public interface KClosestPointstoOrigin {
@@ -62,6 +62,7 @@ public interface KClosestPointstoOrigin {
    * <li>priority queue
    * <li>quick select
    * </ul>
+   *
    * @param points
    * @param K
    * @return
@@ -79,7 +80,8 @@ public interface KClosestPointstoOrigin {
     @Override
     public int[][] kClosest(int[][] points, int K) {
       // 0. create comparator
-      final Comparator<int[]> cmp = (a, b) -> (a[0]*a[0]+a[1]*a[1]) - (b[0]*b[0]+b[1]*b[1]);
+      final Comparator<int[]> cmp =
+          (a, b) -> (a[0] * a[0] + a[1] * a[1]) - (b[0] * b[0] + b[1] * b[1]);
       // 1. sort
       Arrays.sort(points, cmp);
       // 2. select k
@@ -95,23 +97,25 @@ public interface KClosestPointstoOrigin {
      * 思路：对points使用half selection，当k个元素有序时就可以不用排序
      * <p>时间复杂度：最差是K=N即O(N*N)
      * <p>空间复杂度：归并排序使用空间O(N)
-     * 
      */
     @Override
     public int[][] kClosest(int[][] points, int K) {
       // 0. create comparator
-      final Comparator<int[]> cmp = (a, b) -> (a[0]*a[0]+a[1]*a[1]) - (b[0]*b[0]+b[1]*b[1]);
+      final Comparator<int[]> cmp =
+          (a, b) -> (a[0] * a[0] + a[1] * a[1]) - (b[0] * b[0] + b[1] * b[1]);
       // 1. selection for k
       for (int i = 0; i < points.length; i++) {
         int minIdx = i;
-        for (int j = minIdx+1; j < points.length; j++) {
-          if (cmp.compare(points[minIdx], points[j]) > 0)
+        for (int j = minIdx + 1; j < points.length; j++) {
+          if (cmp.compare(points[minIdx], points[j]) > 0) {
             minIdx = j;
+          }
         }
         swap(points, i, minIdx);
         // 2. at least k has sorted
-        if (i >= K-1)
+        if (i >= K - 1) {
           break;
+        }
       }
       return Arrays.copyOf(points, K);
     }
@@ -137,20 +141,23 @@ public interface KClosestPointstoOrigin {
     @Override
     public int[][] kClosest(int[][] points, int K) {
       // 0. create max priority queue
-      final Comparator<int[]> cmp = (a, b) -> (b[0]*b[0]+b[1]*b[1]) - (a[0]*a[0]+a[1]*a[1]);
+      final Comparator<int[]> cmp =
+          (a, b) -> (b[0] * b[0] + b[1] * b[1]) - (a[0] * a[0] + a[1] * a[1]);
       final Queue<int[]> queue = new PriorityQueue<>(K, cmp);
       // 1. offer k elements for all points
       for (int[] p : points) {
         queue.offer(p);
         // 2. poll k+1 elelment
-        if (queue.size() > K)
+        if (queue.size() > K) {
           queue.poll();
+        }
       }
       int[][] res = new int[K][2];
       int i = 0;
       // 使用poll会增加多余的操作时间
-      for (int[] p : queue)
+      for (int[] p : queue) {
         res[i++] = p;
+      }
       return res;
     }
   }
@@ -160,7 +167,7 @@ public interface KClosestPointstoOrigin {
   @SortAlgorithm(timeComplexity = @TimeComplexity(average = ComplexityEnum.O_N, best = ComplexityEnum.O_N, worst = ComplexityEnum.O_N_K), spaceComplexity = ComplexityEnum.O_K)
   @Submission(memory = 57.8, memoryBeatRate = 85.09, runtime = 4, runtimeBeatRate = 99.68, submittedDate = @DateTime("20191223"), url = "https://leetcode.com/submissions/detail/287854522/")
   public static class SolutionByQuickSelect implements KClosestPointstoOrigin {
-    
+
     /**
      * 思路：quick select切分出第K个元素。不需要排序
      * <p>问题：
@@ -183,19 +190,22 @@ public interface KClosestPointstoOrigin {
     @Override
     public int[][] kClosest(int[][] points, int K) {
       K -= 1;
-      int lo = 0, hi = points.length-1;
+      int lo = 0, hi = points.length - 1;
       while (true) {
         // 0. get position of partition between lo, hi
         int mid = partition(points, lo, hi);
         // 1. position elements less than K
-        if (mid < K)
+        if (mid < K) {
           lo = mid + 1;
+        }
         // 2. elements more than K
-        else if (mid > K)
+        else if (mid > K) {
           hi = mid - 1;
+        }
         // 3. K elements
-        else 
-          return Arrays.copyOf(points, K+1);
+        else {
+          return Arrays.copyOf(points, K + 1);
+        }
       }
     }
 
@@ -203,15 +213,21 @@ public interface KClosestPointstoOrigin {
 
     static int partition(int[][] points, int lo, int hi) {
       // random pivot
-      swap(points, lo, RAND.nextInt(hi-lo+1)+lo);
-      final int 
-        pivot = lo,
-        pivotDist = distance(points, pivot);
+      swap(points, lo, RAND.nextInt(hi - lo + 1) + lo);
+      final int
+          pivot = lo,
+          pivotDist = distance(points, pivot);
       hi++;
       while (true) {
-        while (distance(points, --hi) > pivotDist);
-        while (lo < hi && distance(points, ++lo) < pivotDist);
-        if (lo >= hi) break;
+        while (distance(points, --hi) > pivotDist) {
+          ;
+        }
+        while (lo < hi && distance(points, ++lo) < pivotDist) {
+          ;
+        }
+        if (lo >= hi) {
+          break;
+        }
         swap(points, lo, hi);
       }
       swap(points, pivot, hi);
@@ -225,7 +241,7 @@ public interface KClosestPointstoOrigin {
     }
 
     static int compare(int[] a, int[] b) {
-      return (a[0]*a[0]+a[1]*a[1]) - (b[0]*b[0]+b[1]*b[1]);
+      return (a[0] * a[0] + a[1] * a[1]) - (b[0] * b[0] + b[1] * b[1]);
     }
 
     static int distance(int[][] points, int i) {
@@ -244,28 +260,31 @@ public interface KClosestPointstoOrigin {
     @Override
     public int[][] kClosest(int[][] points, int K) {
       K -= 1;
-      int lo = 0, hi = points.length - 1; 
+      int lo = 0, hi = points.length - 1;
       while (true) {
         // 0. partition
         int mid = partition(points, lo, hi);
         // 1. check partition position and K 
-        if (mid < K)
+        if (mid < K) {
           lo = mid + 1;
-        else if (mid > K)
+        } else if (mid > K) {
           hi = mid - 1;
-        else  
+        } else {
           break;
+        }
       }
       // 2. return array of k
-      return Arrays.copyOf(points, K+1);
+      return Arrays.copyOf(points, K + 1);
     }
 
     static int partition(int[][] points, int lo, int hi) {
       int pivot = lo;
       while (lo <= hi) {
-        if (compare(points[pivot], points[lo]) < 0)
+        if (compare(points[pivot], points[lo]) < 0) {
           swap(points, lo, hi--);
-        else lo++;
+        } else {
+          lo++;
+        }
       }
       swap(points, pivot, hi);
       return hi;
@@ -278,7 +297,7 @@ public interface KClosestPointstoOrigin {
     }
 
     static int compare(int[] a, int[] b) {
-      return (a[0]*a[0]+a[1]*a[1]) - (b[0]*b[0]+b[1]*b[1]);
+      return (a[0] * a[0] + a[1] * a[1]) - (b[0] * b[0] + b[1] * b[1]);
     }
 
     static int distance(int[][] points, int i) {
@@ -291,7 +310,7 @@ public interface KClosestPointstoOrigin {
     // int[][] a = {{3,3},{5,-1},{-2,4}};
     int count = 100;
     while (count-- > 0) {
-      int[][] a = { { -2, 10 }, { -4, -8 }, { 10, 7 }, { -4, -7 } };
+      int[][] a = {{-2, 10}, {-4, -8}, {10, 7}, {-4, -7}};
       // int[][] a = {{1,3},{-2,2}};
       System.err.println(Arrays.deepToString(p.kClosest(a, 3)));
     }

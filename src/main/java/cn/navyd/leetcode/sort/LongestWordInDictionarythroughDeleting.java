@@ -14,28 +14,27 @@ import cn.navyd.annotation.leetcode.Unskilled;
 
 /**
  * <pre>
-Given a string and a string dictionary, find the longest string in the dictionary that can be formed by deleting some characters of the given string. If there are more than one possible results, return the longest word with the smallest lexicographical order. If there is no possible result, return the empty string.
-
-Example 1:
-Input:
-s = "abpcplea", d = ["ale","apple","monkey","plea"]
-
-Output: 
-"apple"
-Example 2:
-Input:
-s = "abpcplea", d = ["a","b","c"]
-
-Output: 
-"a"
-Note:
-All the strings in the input will only contain lower-case letters.
-The size of the dictionary won't exceed 1,000.
-The length of all the strings in the input won't exceed 1,000.
- * </pre>
- * 
- * @author navyd
+ * Given a string and a string dictionary, find the longest string in the dictionary that can be formed by deleting some characters of the given string. If there are more than one possible results, return the longest word with the smallest lexicographical order. If there is no possible result, return the empty string.
  *
+ * Example 1:
+ * Input:
+ * s = "abpcplea", d = ["ale","apple","monkey","plea"]
+ *
+ * Output:
+ * "apple"
+ * Example 2:
+ * Input:
+ * s = "abpcplea", d = ["a","b","c"]
+ *
+ * Output:
+ * "a"
+ * Note:
+ * All the strings in the input will only contain lower-case letters.
+ * The size of the dictionary won't exceed 1,000.
+ * The length of all the strings in the input won't exceed 1,000.
+ * </pre>
+ *
+ * @author navyd
  */
 @Unskilled
 @Problem(number = 524, difficulty = Difficulty.MEDIUM, tags = Tag.SORT,
@@ -43,6 +42,7 @@ The length of all the strings in the input won't exceed 1,000.
 public interface LongestWordInDictionarythroughDeleting {
   /**
    * 在字典中找到字符串s匹配的 最长、字典顺序的 单词
+   *
    * @param s
    * @param d
    * @return
@@ -85,17 +85,20 @@ public interface LongestWordInDictionarythroughDeleting {
       for (String word : dictionary) {
         int i = 0;
         // 在chars中顺序匹配word单词字符
-        for (char c : chars)
-          if (i < word.length() && c == word.charAt(i))
+        for (char c : chars) {
+          if (i < word.length() && c == word.charAt(i)) {
             i++;
+          }
+        }
         // 所有字符顺序匹配
-        if (i == word.length())
+        if (i == word.length()) {
           return word;
+        }
       }
       return "";
     }
   }
-  
+
   @Optimal
   @Author(name = "hot13399",
       referenceUrls = "https://leetcode.com/problems/longest-word-in-dictionary-through-deleting/discuss/99588/Short-Java-Solutions-Sorting-Dictionary-and-Without-Sorting/103703")
@@ -127,18 +130,21 @@ public interface LongestWordInDictionarythroughDeleting {
       }
       return longestWord;
     }
-    
+
     /**
      * 如果单词在s中顺序被找到，则返回true
+     *
      * @param s
      * @param words
      * @return
      */
     static boolean isSubsequence(char[] s, char[] word) {
       int i = 0;
-      for (char c : s)
-        if (i < word.length && word[i] == c)
+      for (char c : s) {
+        if (i < word.length && word[i] == c) {
           i++;
+        }
+      }
       return i == word.length;
     }
   }
